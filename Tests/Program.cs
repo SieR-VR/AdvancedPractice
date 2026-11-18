@@ -2,6 +2,12 @@ using System;
 using AdvancedPractice.Models;
 static class Program
 {
+    sealed class HintNote
+    {
+        public double Time;
+        public int Hand;
+        public HintNote(double time, int hand) { Time = time; Hand = hand; }
+    }
     static int assertions;
     static void Equal(double expected, double actual)
     {
@@ -47,6 +53,29 @@ static class Program
         var returned = selections.RestoreOrCreate(expert, 155, 16);
         Equal(155, returned.TargetBpm); Equal(50, returned.Beat); Equal(13, returned.Njs);
         Equal(200, selections.RestoreOrCreate(otherSong, 200, 18).TargetBpm);
+        double[] noteTimes = { 1, 2, 2, 3, 5 };
+        Equal(1, OpeningNotes.Find(noteTimes, 0, t => t)[0]);
+        Equal(2, OpeningNotes.Find(noteTimes, 1.5, t => t).Length);
+        Equal(2, OpeningNotes.Find(noteTimes, 2, t => t).Length);
+        Equal(3, OpeningNotes.Find(noteTimes, 2.001, t => t)[0]);
+        Equal(0, OpeningNotes.Find(noteTimes, 6, t => t).Length);
+        Equal(0, OpeningNotes.Find(new double[0], 0, t => t).Length);
+        Equal(5, OpeningNotes.Find(noteTimes, 5, t => t)[0]);
+        HintNote[] staggered = { new HintNote(1, 0), new HintNote(1.5, 0), new HintNote(2, 1), new HintNote(3, 0), new HintNote(3, 1) };
+        var hands = OpeningNotes.FindForHands(staggered, 0, n => n.Time, n => n.Hand);
+        Equal(2, hands.Length); Equal(1, hands[0].Time); Equal(2, hands[1].Time);
+        hands = OpeningNotes.FindForHands(staggered, 1.6, n => n.Time, n => n.Hand);
+        Equal(3, hands[0].Time); Equal(2, hands[1].Time);
+        hands = OpeningNotes.FindForHands(staggered, 3, n => n.Time, n => n.Hand);
+        Equal(3, hands[0].Time); Equal(3, hands[1].Time);
+        hands = OpeningNotes.FindForHands(new[] { new HintNote(1, 1) }, 0, n => n.Time, n => n.Hand);
+        assertions++;
+        if (hands[0] != null || hands[1] == null) throw new Exception("Missing hand must retain its empty slot.");
+        hands = OpeningNotes.FindForHands(staggered, 4, n => n.Time, n => n.Hand);
+        assertions++;
+        if (hands[0] != null || hands[1] != null) throw new Exception("Past notes must not appear in hints.");
+        hands = OpeningNotes.FindForHands(new[] { new HintNote(0, -1), new HintNote(2, 0), new HintNote(4, 1) }, 0, n => n.Time, n => n.Hand);
+        Equal(2, hands[0].Time); Equal(4, hands[1].Time);
         Console.WriteLine($"Passed {assertions} assertions (timing, speed bounds, selection restore and chart isolation).");
     }
 }

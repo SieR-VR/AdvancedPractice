@@ -1,4 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net10.0</TargetFramework></PropertyGroup>
-  <ItemGroup><Compile Include="..\Models\BeatTimeline.cs" Link="BeatTimeline.cs"/><Compile Include="..\Models\PracticeMath.cs" Link="PracticeMath.cs"/><Compile Include="..\Models\PracticeSelectionStore.cs" Link="PracticeSelectionStore.cs"/></ItemGroup>
+  <ItemGroup><Compile Include="..\Models\BeatTimeline.cs" Link="BeatTimeline.cs"/><Compile Include="..\Models\PracticeMath.cs" Link="PracticeMath.cs"/><Compile Include="..\Models\PracticeSelectionStore.cs" Link="PracticeSelectionStore.cs"/><Compile Include="..\Models\OpeningNotes.cs" Link="OpeningNotes.cs"/></ItemGroup>
 </Project>

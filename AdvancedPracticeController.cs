@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AdvancedPractice.Configuration;
 using AdvancedPractice.Models;
+using AdvancedPractice.Views;
 using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components.Settings;
@@ -25,6 +26,11 @@ namespace AdvancedPractice
         private PracticeViewController view;
         private BeatTimeline timeline;
         private NoteJumpSpeedEventData[] njsEvents;
+        private NoteData[] notes;
+        private NoteData[] visibleHintNotes;
+        private GameObject noteHint;
+        private TextMeshProUGUI noteHintLabel;
+        private readonly List<GameObject> noteTiles = new List<GameObject>();
         private GameObject panel;
         private RectTransform playRect;
         private Vector2 originalPlayPosition;
@@ -67,6 +73,8 @@ namespace AdvancedPractice
             UnbindSliders();
             RestoreNativeControls();
             if (panel != null) { panel.SetActive(false); Destroy(panel); }
+            if (noteHint != null) { noteHint.SetActive(false); Destroy(noteHint); }
+            noteTiles.Clear();
             view = owner;
             SelectedSettings = null;
             try
@@ -82,6 +90,9 @@ namespace AdvancedPractice
                 if (data == null) throw new InvalidOperationException("Beatmap data unavailable.");
                 timeline = new BeatTimeline(level.beatsPerMinute, data.GetBeatmapDataItems<BPMChangeBeatmapEventData>(0).Select(e => new BeatTimeline.Change(e.time, e.bpm)));
                 njsEvents = data.GetBeatmapDataItems<NoteJumpSpeedEventData>(0).OrderBy(e => e.time).ToArray();
+                notes = data.GetBeatmapDataItems<NoteData>(0)
+                    .Where(n => n.gameplayType == NoteData.GameplayType.Normal || n.gameplayType == NoteData.GameplayType.BurstSliderHead)
+                    .OrderBy(n => n.time).ThenBy(n => n.lineIndex).ToArray();
                 maxTime = Mathf.Max(0, level.songDuration - 1);
                 defaultNjs = key.difficulty.NoteJumpMovementSpeed(level.GetDifficultyBeatmapData(key.beatmapCharacteristic, key.difficulty).noteJumpMovementSpeed, false);
                 activeChart = key;
@@ -122,6 +133,7 @@ namespace AdvancedPractice
                 content.sizeDelta = Vector2.zero;
                 LayoutRebuilder.ForceRebuildLayoutImmediate(content);
                 PlacePlayBelow(content);
+                CreateNoteHint();
                 ready = true;
                 BindSliders();
                 SelectedLevel = key.levelId;
@@ -135,7 +147,107 @@ namespace AdvancedPractice
                 ready = false;
                 UnbindSliders();
                 if (panel != null) { panel.SetActive(false); Destroy(panel); }
+                if (noteHint != null) { noteHint.SetActive(false); Destroy(noteHint); }
                 RestoreNativeControls();
+            }
+        }
+        private void CreateNoteHint()
+        {
+            visibleHintNotes = null;
+            // A sibling avoids the button's layout, animation and content sizing.
+            noteHint = new GameObject("FirstNoteHint", typeof(RectTransform), typeof(LayoutElement));
+            noteHint.layer = 5;
+            noteHint.transform.SetParent(playRect.parent, false);
+            noteHint.GetComponent<LayoutElement>().ignoreLayout = true;
+            var hintRect = (RectTransform)noteHint.transform;
+            hintRect.anchorMin = hintRect.anchorMax = new Vector2(.5f, .5f);
+            hintRect.pivot = new Vector2(1, .5f);
+            hintRect.sizeDelta = new Vector2(22, 11);
+            PositionNoteHint();
+            var labelObject = new GameObject("Label", typeof(RectTransform));
+            labelObject.layer = 5;
+            labelObject.transform.SetParent(noteHint.transform, false);
+            noteHintLabel = labelObject.AddComponent<TextMeshProUGUI>();
+            var playText = playRect.GetComponentInChildren<TextMeshProUGUI>();
+            noteHintLabel.font = playText.font;
+            noteHintLabel.fontSharedMaterial = playText.fontSharedMaterial;
+            noteHintLabel.fontSize = 2.5f;
+            noteHintLabel.alignment = TextAlignmentOptions.Center;
+            noteHintLabel.raycastTarget = false;
+            var labelRect = noteHintLabel.rectTransform;
+            labelRect.anchorMin = new Vector2(0, 1);
+            labelRect.anchorMax = Vector2.one;
+            labelRect.pivot = new Vector2(.5f, 1);
+            labelRect.sizeDelta = new Vector2(0, 4);
+            labelRect.anchoredPosition = Vector2.zero;
+        }
+        private void PositionNoteHint()
+        {
+            // Position the hint's RIGHT edge outside Play's actual LEFT edge.
+            noteHint.transform.position = playRect.TransformPoint(new Vector3(playRect.rect.xMin - 5f, playRect.rect.center.y, 0));
+        }
+        private void LateUpdate()
+        {
+            if (ready && noteHint != null && noteHint.activeSelf) PositionNoteHint();
+        }
+        private void UpdateNoteHint()
+        {
+            var firstNotes = OpeningNotes.FindForHands(notes, Time, n => n.time, n => n.colorType == ColorType.ColorA ? 0 : n.colorType == ColorType.ColorB ? 1 : -1);
+            if (visibleHintNotes != null && firstNotes.SequenceEqual(visibleHintNotes)) return;
+            visibleHintNotes = firstNotes;
+            foreach (var tile in noteTiles) { tile.SetActive(false); Destroy(tile); }
+            noteTiles.Clear();
+            noteHintLabel.text = "Next L / R";
+            int count = 2;
+            for (int i = 0; i < count; i++)
+            {
+                var note = firstNotes[i];
+                var tile = new GameObject("NoteHint", typeof(RectTransform), typeof(ImageView));
+                tile.layer = 5;
+                tile.transform.SetParent(noteHint.transform, false);
+                noteTiles.Add(tile);
+                var rect = (RectTransform)tile.transform;
+                rect.anchorMin = rect.anchorMax = new Vector2(.5f, 0);
+                rect.pivot = new Vector2(.5f, 0);
+                rect.sizeDelta = new Vector2(6, 6);
+                rect.anchoredPosition = new Vector2((i - (count - 1) * .5f) * 7, 0);
+                var image = tile.GetComponent<Image>();
+                // Match BSML ImageTag: Unity's default UI shader is not suitable
+                // for Beat Saber's world-space UI and bloom render path.
+                image.material = Utilities.ImageResources.NoGlowMat;
+                image.sprite = Utilities.ImageResources.WhitePixel;
+                image.color = note == null ? new Color(.2f, .2f, .2f) : i == 0 ? new Color(.7f, .08f, .1f) : new Color(.05f, .35f, .8f);
+                image.raycastTarget = false;
+                if (note == null)
+                {
+                    var emptyObject = new GameObject("NoNote", typeof(RectTransform));
+                    emptyObject.layer = 5;
+                    emptyObject.transform.SetParent(tile.transform, false);
+                    var emptyText = emptyObject.AddComponent<TextMeshProUGUI>();
+                    emptyText.font = noteHintLabel.font;
+                    emptyText.fontSharedMaterial = noteHintLabel.fontSharedMaterial;
+                    emptyText.text = "None";
+                    emptyText.fontSize = 1.5f;
+                    emptyText.alignment = TextAlignmentOptions.Center;
+                    emptyText.raycastTarget = false;
+                    emptyText.rectTransform.anchorMin = Vector2.zero;
+                    emptyText.rectTransform.anchorMax = Vector2.one;
+                    emptyText.rectTransform.sizeDelta = Vector2.zero;
+                    continue;
+                }
+                var arrow = new GameObject("CutDirection", typeof(RectTransform), typeof(NoteDirectionGraphic));
+                arrow.layer = 5;
+                arrow.transform.SetParent(tile.transform, false);
+                var arrowRect = (RectTransform)arrow.transform;
+                arrowRect.anchorMin = Vector2.zero; arrowRect.anchorMax = Vector2.one;
+                arrowRect.sizeDelta = Vector2.zero;
+                var graphic = arrow.GetComponent<NoteDirectionGraphic>();
+                graphic.material = Utilities.ImageResources.NoGlowMat;
+                graphic.Direction = note.cutDirection.Direction();
+                graphic.AngleOffset = note.cutDirectionAngleOffset;
+                graphic.color = Color.white;
+                graphic.raycastTarget = false;
+                graphic.SetVerticesDirty();
             }
         }
         private void BindSliders()
@@ -237,6 +349,7 @@ namespace AdvancedPractice
             nativeSpeed.value = speed / bpm;
             startInfoText.text = StartInfo;
             speedInfoText.text = SpeedInfo;
+            UpdateNoteHint();
             selections.Save(activeChart, new PracticeSelection(beat, speed, njs));
             }
             finally { syncing = false; }
@@ -254,11 +367,13 @@ namespace AdvancedPractice
             ready = false;
             UnbindSliders();
             if (panel != null) panel.SetActive(false);
+            if (noteHint != null) noteHint.SetActive(false);
             RestoreNativeControls();
         }
         private void OnDestroy()
         {
             cancellation?.Cancel(); cancellation?.Dispose();
+            if (noteHint != null) Destroy(noteHint);
         }
     }
 
