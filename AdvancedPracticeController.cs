@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AdvancedPractice.Configuration;
 using AdvancedPractice.Models;
+using AdvancedPractice.Compatibility;
 using AdvancedPractice.Views;
 using BeatSaberMarkupLanguage;
 using BeatSaberMarkupLanguage.Attributes;
@@ -25,7 +26,7 @@ namespace AdvancedPractice
         private BeatmapKey activeChart;
         private PracticeViewController view;
         private BeatTimeline timeline;
-        private NoteJumpSpeedEventData[] njsEvents;
+        private NjsTimeline njsTimeline;
         private NoteData[] notes;
         private NoteData[] visibleHintNotes;
         private GameObject noteHint;
@@ -51,7 +52,7 @@ namespace AdvancedPractice
         [UIValue("speed")] public float Speed { get => speed; set { if (syncing || !ready) return; speed = value; Sync(); } }
         [UIValue("njs")] public float Njs { get => njs; set { if (syncing || !ready) return; njs = Mathf.Clamp(value, 1, 50); Sync(); } }
         private float Time => (float)timeline.ToSeconds(beat);
-        [UIValue("start-info")] public string StartInfo => $"{Time:F3} seconds  |  {timeline.BpmAt(Time):0.###} BPM" + (njsEvents.Length > 0 ? $"  |  NJS {MapNjs(Time):0.###}" : "");
+        [UIValue("start-info")] public string StartInfo => $"{Time:F3} seconds  |  {timeline.BpmAt(Time):0.###} BPM" + (njsTimeline.HasChanges ? $"  |  NJS {MapNjs(Time):0.###}" : "");
         [UIValue("speed-info")] public string SpeedInfo => $"{speed / timeline.BpmAt(Time) * 100:0.###}%";
         [UIAction("beat-format")] public string BeatFormat(float value) => $"{value:0} beat";
         [UIAction("speed-format")] public string SpeedFormat(float value) => $"{speed:0.###} BPM";
@@ -79,22 +80,16 @@ namespace AdvancedPractice
             SelectedSettings = null;
             try
             {
-                var key = Field<BeatmapKey>(view, "_beatmapKey");
-                var level = Field<BeatmapLevel>(view, "_beatmapLevel");
-                var entitlement = Field<BeatmapLevelsEntitlementModel>(view, "_beatmapLevelsEntitlementModel");
-                var version = await entitlement.GetLevelDataVersionAsync(key.levelId, token);
-                var loaded = await Field<BeatmapLevelsModel>(view, "_beatmapLevelsModel").LoadBeatmapLevelDataAsync(key.levelId, version, token);
-                if (loaded.isError) throw new InvalidOperationException("Could not load beatmap data.");
-                var data = await new BeatmapDataLoader().LoadBeatmapDataAsync(loaded.beatmapLevelData, key, level.beatsPerMinute, false, null, null, version, null, null, false);
-                token.ThrowIfCancellationRequested();
-                if (data == null) throw new InvalidOperationException("Beatmap data unavailable.");
-                timeline = new BeatTimeline(level.beatsPerMinute, data.GetBeatmapDataItems<BPMChangeBeatmapEventData>(0).Select(e => new BeatTimeline.Change(e.time, e.bpm)));
-                njsEvents = data.GetBeatmapDataItems<NoteJumpSpeedEventData>(0).OrderBy(e => e.time).ToArray();
+                var chart = await PracticeChartLoader.Load(view, token);
+                var key = chart.Key;
+                var data = chart.Data;
+                timeline = new BeatTimeline(chart.Bpm, data.GetBeatmapDataItems<BPMChangeBeatmapEventData>(0).Select(e => new BeatTimeline.Change(e.time, e.bpm)));
+                defaultNjs = chart.DefaultNjs;
+                njsTimeline = new NjsTimeline(data, defaultNjs);
                 notes = data.GetBeatmapDataItems<NoteData>(0)
                     .Where(n => n.gameplayType == NoteData.GameplayType.Normal || n.gameplayType == NoteData.GameplayType.BurstSliderHead)
                     .OrderBy(n => n.time).ThenBy(n => n.lineIndex).ToArray();
-                maxTime = Mathf.Max(0, level.songDuration - 1);
-                defaultNjs = key.difficulty.NoteJumpMovementSpeed(level.GetDifficultyBeatmapData(key.beatmapCharacteristic, key.difficulty).noteJumpMovementSpeed, false);
+                maxTime = Mathf.Max(0, chart.Duration - 1);
                 activeChart = key;
                 // The game's practice speed persists globally across songs. Never use
                 // that multiplier as the initial target BPM of a newly selected chart.
@@ -112,17 +107,17 @@ namespace AdvancedPractice
                 rect.sizeDelta = new Vector2(105, 52);
                 rect.anchoredPosition = new Vector2(0, -2);
                 using (var reader = new StreamReader(Assembly.GetExecutingAssembly().GetManifestResourceStream("AdvancedPractice.Views.Practice.bsml")))
-                    BSMLParser.Instance.Parse(reader.ReadToEnd(), root, this);
+                    Legato.Presentation.BsmlParser.Instance.Parse(reader.ReadToEnd(), root, this);
                 UseFullWidthSlider(beatSlider);
                 UseFullWidthSlider(speedSlider);
-                beatSlider.Slider.maxValue = Mathf.Max(1, (float)Math.Floor(timeline.ToBeat(maxTime)));
-                beatSlider.Increments = 1;
-                njsSlider.Increments = Mathf.Clamp(PluginConfig.Instance.NjsStep, .1f, 10);
-                if (float.IsNaN(njsSlider.Increments)) njsSlider.Increments = 1;
-                int njsSteps = Mathf.FloorToInt(49 / njsSlider.Increments);
-                njsSlider.Slider.maxValue = 1 + njsSteps * njsSlider.Increments;
-                njsSlider.Slider.numberOfSteps = njsSteps + 1;
-                beatSlider.Slider.numberOfSteps = Mathf.RoundToInt(beatSlider.Slider.maxValue) + 1;
+                beatSlider.GetSlider().maxValue = Mathf.Max(1, (float)Math.Floor(timeline.ToBeat(maxTime)));
+                beatSlider.SetIncrements(1);
+                njsSlider.SetIncrements(Mathf.Clamp(PluginConfig.Instance.NjsStep, .1f, 10));
+                if (float.IsNaN(njsSlider.GetIncrements())) njsSlider.SetIncrements(1);
+                int njsSteps = Mathf.FloorToInt(49 / njsSlider.GetIncrements());
+                njsSlider.GetSlider().maxValue = 1 + njsSteps * njsSlider.GetIncrements();
+                njsSlider.GetSlider().numberOfSteps = njsSteps + 1;
+                beatSlider.GetSlider().numberOfSteps = Mathf.RoundToInt(beatSlider.GetSlider().maxValue) + 1;
                 // Native controls retain their values for preview and Play handling.
                 HideNativeControls();
                 var content = (RectTransform)root.transform.GetChild(0);
@@ -254,27 +249,27 @@ namespace AdvancedPractice
         {
             // Listen to user gestures directly; programmatic value assignments do not
             // emit this event. Sync's guard also blocks callbacks from range changes.
-            beatSlider.UpdateOnChange = speedSlider.UpdateOnChange = njsSlider.UpdateOnChange = false;
-            beatSlider.Slider.normalizedValueDidChangeEvent += BeatChanged;
-            speedSlider.Slider.normalizedValueDidChangeEvent += SpeedChanged;
-            njsSlider.Slider.normalizedValueDidChangeEvent += NjsChanged;
+            beatSlider.DisableAutoApply(); speedSlider.DisableAutoApply(); njsSlider.DisableAutoApply();
+            beatSlider.GetSlider().normalizedValueDidChangeEvent += BeatChanged;
+            speedSlider.GetSlider().normalizedValueDidChangeEvent += SpeedChanged;
+            njsSlider.GetSlider().normalizedValueDidChangeEvent += NjsChanged;
         }
         private void UnbindSliders()
         {
-            if (beatSlider != null) beatSlider.Slider.normalizedValueDidChangeEvent -= BeatChanged;
-            if (speedSlider != null) speedSlider.Slider.normalizedValueDidChangeEvent -= SpeedChanged;
-            if (njsSlider != null) njsSlider.Slider.normalizedValueDidChangeEvent -= NjsChanged;
+            if (beatSlider != null) beatSlider.GetSlider().normalizedValueDidChangeEvent -= BeatChanged;
+            if (speedSlider != null) speedSlider.GetSlider().normalizedValueDidChangeEvent -= SpeedChanged;
+            if (njsSlider != null) njsSlider.GetSlider().normalizedValueDidChangeEvent -= NjsChanged;
         }
-        private void BeatChanged(TextSlider slider, float normalized) { Beat = beatSlider.Slider.ConvertFromNormalizedValue(normalized); }
-        private void SpeedChanged(TextSlider slider, float normalized) { Speed = speedSlider.Slider.ConvertFromNormalizedValue(normalized); }
-        private void NjsChanged(TextSlider slider, float normalized) { Njs = njsSlider.Slider.ConvertFromNormalizedValue(normalized); }
+        private void BeatChanged(TextSlider slider, float normalized) { Beat = beatSlider.GetSlider().ConvertFromNormalizedValue(normalized); }
+        private void SpeedChanged(TextSlider slider, float normalized) { Speed = speedSlider.GetSlider().ConvertFromNormalizedValue(normalized); }
+        private void NjsChanged(TextSlider slider, float normalized) { Njs = njsSlider.GetSlider().ConvertFromNormalizedValue(normalized); }
         private static void UseFullWidthSlider(SliderSetting setting)
         {
             // BSML's settings prefab reserves 52 units on the right for the slider.
             // These rows have separate headings, so give the slider the entire row.
             var title = setting.transform.Find("Title");
             if (title != null) title.gameObject.SetActive(false);
-            var sliderRect = (RectTransform)setting.Slider.transform;
+            var sliderRect = (RectTransform)setting.GetSlider().transform;
             sliderRect.anchorMin = Vector2.zero;
             sliderRect.anchorMax = Vector2.one;
             sliderRect.pivot = new Vector2(.5f, .5f);
@@ -319,16 +314,7 @@ namespace AdvancedPractice
                 if (target != null) target.SetActive(true);
             hiddenNativeObjects.Clear();
         }
-        private float MapNjs(float seconds)
-        {
-            var current = njsEvents.LastOrDefault(e => e.time <= seconds);
-            if (current == null) return defaultNjs;
-            var next = njsEvents.FirstOrDefault(e => e.time > current.time);
-            float relative = current.relativeNoteJumpSpeed;
-            if (next != null && next.easeType != EaseType.None)
-                relative = Mathf.LerpUnclamped(relative, next.relativeNoteJumpSpeed, Interpolation.Interpolate(Mathf.InverseLerp(current.time, next.time, seconds), next.easeType));
-            return Mathf.Max(.01f, defaultNjs + relative);
-        }
+        private float MapNjs(float seconds) => njsTimeline.ValueAt(seconds);
         private void Sync()
         {
             if (!ready || syncing) return;
@@ -337,11 +323,11 @@ namespace AdvancedPractice
             {
             float bpm = (float)timeline.BpmAt(Time);
             speed = PracticeMath.ClampBpm(speed, bpm);
-            speedSlider.Slider.minValue = Mathf.Ceil(bpm * .1f);
-            speedSlider.Slider.maxValue = Mathf.Max(speedSlider.Slider.minValue + 1, Mathf.Floor(bpm * 5));
-            speedSlider.Slider.numberOfSteps = Mathf.RoundToInt((speedSlider.Slider.maxValue - speedSlider.Slider.minValue)) + 1;
+            speedSlider.GetSlider().minValue = Mathf.Ceil(bpm * .1f);
+            speedSlider.GetSlider().maxValue = Mathf.Max(speedSlider.GetSlider().minValue + 1, Mathf.Floor(bpm * 5));
+            speedSlider.GetSlider().numberOfSteps = Mathf.RoundToInt((speedSlider.GetSlider().maxValue - speedSlider.GetSlider().minValue)) + 1;
             beatSlider.ReceiveValue(); speedSlider.ReceiveValue(); njsSlider.ReceiveValue();
-            beatSlider.Slider.Refresh(); speedSlider.Slider.Refresh(); njsSlider.Slider.Refresh();
+            beatSlider.GetSlider().Refresh(); speedSlider.GetSlider().Refresh(); njsSlider.GetSlider().Refresh();
             float nativeMaxTime = Field<float>(view, "_maxStartSongTime");
             Field<TimeSlider>(view, "_songStartSlider").value = nativeMaxTime > 0 ? Time / nativeMaxTime : 0;
             var nativeSpeed = Field<PercentSlider>(view, "_speedSlider");
@@ -399,13 +385,14 @@ namespace AdvancedPractice
         {
             Apply = ____sceneSetupData.practiceSettings != null &&
                 ReferenceEquals(____sceneSetupData.practiceSettings, AdvancedPracticeController.SelectedSettings) &&
-                ____sceneSetupData.beatmapKey.levelId == AdvancedPracticeController.SelectedLevel;
+                PracticeChartLoader.SceneLevelId(____sceneSetupData) == AdvancedPracticeController.SelectedLevel;
         }
         private static Exception Finalizer(Exception __exception) { Apply = false; return __exception; }
     }
-    [HarmonyPatch(typeof(BeatmapObjectSpawnController.InitData), MethodType.Constructor, new[] { typeof(float), typeof(int), typeof(float), typeof(BeatmapObjectSpawnMovementData.NoteJumpValueType), typeof(float) })]
+    [HarmonyPatch]
     internal static class NjsPatch
     {
+        private static MethodBase TargetMethod() => AccessTools.GetDeclaredConstructors(typeof(BeatmapObjectSpawnController.InitData)).Single(c => c.GetParameters().Any(p => p.Name == "noteJumpMovementSpeed"));
         private static void Prefix(ref float noteJumpMovementSpeed)
         {
             if (GameplayPatch.Apply) noteJumpMovementSpeed = AdvancedPracticeController.SelectedNjs;

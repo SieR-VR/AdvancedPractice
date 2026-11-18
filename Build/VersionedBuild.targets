@@ -1,0 +1,21 @@
+<Project>
+  <Target Name="CheckGameReferences" BeforeTargets="PrepareForBuild">
+    <Error Condition="'$(SupportedGameVersion)' != 'true'" Text="Unsupported target $(LegatoTargetVersion). Supported targets: 1.44.1, 1.40.8, 1.29.0, 1.37.1, 1.38.0." />
+    <Error Condition="!Exists('$(BeatSaberDir)\Beat Saber_Data\Managed\Main.dll')" Text="Set BeatSaberDir to the matching $(LegatoTargetVersion) installation, or use Build/Build.ps1." />
+    <Error Condition="!Exists('$(ModReferencesDir)\BSML.dll')" Text="BSML.dll is missing from ModReferencesDir ($(ModReferencesDir)). Use the BSML release for $(LegatoTargetVersion)." />
+    <Error Condition="!Exists('$(BeatSaberDir)\Beat Saber_Data\Managed\IPA.Loader.dll')" Text="BSIPA reference IPA.Loader.dll is missing from the selected game installation." />
+    <PropertyGroup Condition="Exists('$(BeatSaberDir)\BeatSaberVersion.txt')">
+      <_InstalledGameVersion>$([System.IO.File]::ReadAllText('$(BeatSaberDir)\BeatSaberVersion.txt').Trim())</_InstalledGameVersion>
+    </PropertyGroup>
+    <Error Condition="'$(_InstalledGameVersion)' != '' AND '$(_InstalledGameVersion)' != '$(LegatoTargetVersion)' AND !$([System.String]::Copy('$(_InstalledGameVersion)').StartsWith('$(LegatoTargetVersion)_'))" Text="Game references report $(_InstalledGameVersion), but the build targets $(LegatoTargetVersion). Select matching references instead of relabeling a binary." />
+    <Message Importance="high" Text="AdvancedPractice: Beat Saber $(LegatoTargetVersion) ($(SupportTier)); source API $(LegatoSourceVersion)." />
+  </Target>
+  <Target Name="GenerateGameManifest" BeforeTargets="PrepareForBuild" DependsOnTargets="CheckGameReferences">
+    <PropertyGroup>
+      <_ManifestContent>$([System.IO.File]::ReadAllText('$(MSBuildProjectDirectory)\manifest.json'))</_ManifestContent>
+      <_ManifestContent>$(_ManifestContent.Replace('1.44.1', '$(LegatoTargetVersion)').Replace('^4.3.7', '$(BsipaRequirement)').Replace('^1.14.1', '$(BsmlRequirement)'))</_ManifestContent>
+    </PropertyGroup>
+    <MakeDir Directories="$(IntermediateOutputPath)" />
+    <WriteLinesToFile File="$(IntermediateOutputPath)manifest.json" Lines="$(_ManifestContent)" Overwrite="true" Encoding="UTF-8" WriteOnlyWhenDifferent="true" />
+  </Target>
+</Project>

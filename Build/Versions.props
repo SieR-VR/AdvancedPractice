@@ -1,0 +1,16 @@
+<Project>
+  <PropertyGroup>
+    <SupportedGameVersion Condition="'$(LegatoTargetVersion)' == '1.44.1' OR '$(LegatoTargetVersion)' == '1.40.8' OR '$(LegatoTargetVersion)' == '1.29.0' OR '$(LegatoTargetVersion)' == '1.37.1' OR '$(LegatoTargetVersion)' == '1.38.0'">true</SupportedGameVersion>
+    <SupportTier>provisional</SupportTier>
+    <SupportTier Condition="'$(LegatoTargetVersion)' == '1.44.1' OR '$(LegatoTargetVersion)' == '1.40.8'">build-verified</SupportTier>
+    <BsipaRequirement>^4.3.0</BsipaRequirement>
+    <BsmlRequirement>^1.12.0</BsmlRequirement>
+    <BsipaRequirement Condition="'$(LegatoTargetVersion)' == '1.44.1'">^4.3.7</BsipaRequirement>
+    <BsmlRequirement Condition="'$(LegatoTargetVersion)' == '1.44.1'">^1.14.1</BsmlRequirement>
+    <BsmlRequirement Condition="'$(LegatoTargetVersion)' == '1.37.1'">^1.11.0</BsmlRequirement>
+    <BsipaRequirement Condition="'$(LegatoTargetVersion)' == '1.29.0'">^4.2.2</BsipaRequirement>
+    <BsmlRequirement Condition="'$(LegatoTargetVersion)' == '1.29.0'">^1.6.0</BsmlRequirement>
+    <OutputPath>bin\$(Configuration)\$(LegatoTargetVersion)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Configuration)\$(LegatoTargetVersion)\</IntermediateOutputPath>
+  </PropertyGroup>
+</Project>

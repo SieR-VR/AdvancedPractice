@@ -2,9 +2,9 @@
   "id": "AdvancedPractice",
   "name": "AdvancedPractice",
   "author": "SieR",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Beat-based practice start, BPM speed and NJS controls.",
-  "gameVersion": "1.40.8",
-  "dependsOn": { "BSIPA": "^4.3.5", "BeatSaberMarkupLanguage": "^1.12.0" },
+  "gameVersion": "1.44.1",
+  "dependsOn": { "BSIPA": "^4.3.7", "BeatSaberMarkupLanguage": "^1.14.1" },
   "conflictsWith": { "PracticePlugin": "*" }
 }

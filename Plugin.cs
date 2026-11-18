@@ -7,6 +7,8 @@ using System.Linq;
 using System.Reflection;
 using BeatSaberMarkupLanguage.Settings;
 using AdvancedPractice.Configuration;
+using AdvancedPractice.Compatibility;
+using BeatSaberMarkupLanguage.Util;
 
 namespace AdvancedPractice
 {
@@ -15,6 +17,7 @@ namespace AdvancedPractice
     {
         internal static IPA.Logging.Logger Log { get; private set; }
         private Harmony harmony;
+        private BSMLSettings registeredSettings;
         [Init]
         public void Init(IPA.Logging.Logger logger, Config config)
         {
@@ -31,13 +34,21 @@ namespace AdvancedPractice
             }
             harmony = new Harmony("AdvancedPractice");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
-            BSMLSettings.Instance.AddSettingsMenu("AdvancedPractice", "AdvancedPractice.Views.Settings.bsml", PluginConfig.Instance);
+            MainMenuAwaiter.MainMenuInitializing += RegisterSettings;
+        }
+        private void RegisterSettings()
+        {
+            var settings = BsmlCompatibility.Settings;
+            if (settings == null || settings == registeredSettings) return;
+            settings.AddSettingsMenu("AdvancedPractice", "AdvancedPractice.Views.Settings.bsml", PluginConfig.Instance);
+            registeredSettings = settings;
         }
         [OnExit]
         public void Exit()
         {
             harmony?.UnpatchSelf();
-            if (harmony != null) BSMLSettings.Instance.RemoveSettingsMenu(PluginConfig.Instance);
+            MainMenuAwaiter.MainMenuInitializing -= RegisterSettings;
+            if (registeredSettings != null) registeredSettings.RemoveSettingsMenu(PluginConfig.Instance);
         }
     }
 }
