@@ -1,0 +1,12 @@
+{
+  "$schema": "https://raw.githubusercontent.com/bsmg/BSIPA-MetadataFileSchema/master/Schema.json",
+  "id": "AdvancedPractice",
+  "name": "AdvancedPractice",
+  "author": "SieR",
+  "version": "0.0.1",
+  "description": "A QoL plugin for practice mod",
+  "gameVersion": "1.18.3",
+  "dependsOn": {
+    "BSIPA": "^4.2.0"
+  }
+}
