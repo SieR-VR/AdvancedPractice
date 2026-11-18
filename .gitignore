@@ -14,3 +14,7 @@
 # OS
 Thumbs.db
 .DS_Store
+.reference/
+.tools/
+Tests/bin/
+Tests/obj/
