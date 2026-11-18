@@ -1,22 +1,24 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-AdvancedPractice is a BSIPA plugin for Beat Saber, built as a .NET Framework 4.7.2 library. `Plugin.cs` handles plugin initialization and starts the persistent Unity component in `AdvancedPracticeController.cs`. `Configuration/PluginConfig.cs` contains a commented-out configuration template; configuration is currently disabled. `Properties/AssemblyInfo.cs` holds assembly metadata, and `manifest.json` declares plugin identity, version, and game dependencies.
+AdvancedPractice extends Beat Saber 1.40.8's practice setup screen. `Plugin.cs` owns BSIPA startup, configuration, and Harmony registration. `AdvancedPracticeController.cs` loads beatmap data, binds controls, and scopes the NJS patch to practice gameplay. `Models/` contains game-independent timing and speed calculations. `Views/` contains embedded BSML for practice controls and Mod Settings. `Configuration/PluginConfig.cs` defines persistent settings; `manifest.json` and `Properties/AssemblyInfo.cs` contain version metadata.
 
-`AdvancedPractice.csproj` explicitly lists source files and embeds the manifest. Add new C# files to its `Compile` items. `Directory.Build.props` enables BeatSaberModdingTools integration. There are currently no test or asset directories.
+`Tests/` is a standalone console regression suite. The project explicitly includes C# files; add new source paths to `AdvancedPractice.csproj` when introducing directories. `.reference/` and `.tools/` are ignored local research utilities, not shipped dependencies.
 
 ## Build, Test, and Development Commands
-Use a Windows Visual Studio Developer PowerShell with MSBuild and the .NET Framework 4.7.2 targeting pack installed. Set `BeatSaberDir` in the ignored `AdvancedPractice.csproj.user` file to your local game installation; referenced game and BSIPA DLLs must exist under `Beat Saber_Data/Managed`.
+Set `BeatSaberDir` in the ignored `AdvancedPractice.csproj.user` file to a local Beat Saber 1.40.8 installation containing BSIPA and BSML. The plugin targets .NET Framework 4.8; the test runner targets .NET 10.
 
-- `msbuild AdvancedPractice.csproj /restore /p:Configuration=Debug /p:DisableCopyToPlugins=True` restores build dependencies and compiles into `bin/Debug/` without copying the plugin into the game.
-- `msbuild AdvancedPractice.csproj /restore /p:Configuration=Release /p:DisableCopyToPlugins=True` builds the optimized library in `bin/Release/`.
-- Omit `/p:DisableCopyToPlugins=True` when intentionally deploying through the modding build tasks for local game testing.
+- `dotnet build AdvancedPractice.csproj -c Release` builds `bin/Release/AdvancedPractice.dll` without deploying into the game.
+- `dotnet build AdvancedPractice.csproj -c Debug` produces a development build.
+- `dotnet run --project Tests/AdvancedPractice.Tests.csproj -c Release` checks BPM boundaries, conversion round trips, and speed bounds.
+
+Copy the DLL into the game's `Plugins/` directory only when intentionally testing it. Remove PracticePlugin first.
 
 ## Coding Style & Naming Conventions
-Follow the existing C# style: four-space indentation, braces on separate lines, PascalCase for types, methods, and properties, and camelCase for parameters and local variables. Keep namespaces under `AdvancedPractice` and filenames aligned with class names. Use `Plugin.Log` for diagnostics and preserve Unity lifecycle method names. No formatter or lint configuration is present.
+Use four-space indentation, separate-line braces, PascalCase for types and public members, and camelCase for parameters and private fields. Match filenames to their primary class and keep namespaces under `AdvancedPractice`. Use `Plugin.Log` for diagnostics. No formatter or lint tool is configured. Keep timing calculations independent of Unity where practical.
 
 ## Testing Guidelines
-No automated test framework or coverage threshold is configured. Build changes and manually verify plugin startup, scene transitions, singleton behavior, and shutdown in a compatible Beat Saber installation. The manifest currently targets game version `1.18.3` and BSIPA `^4.2.0`. Include reproduction steps and relevant log output for behavior changes.
+Add deterministic assertions to the console suite for timing or arithmetic changes. There is no coverage threshold or external test framework. Validate Unity lifecycle, BSML layout, VNJS easing, restart behavior, and JDFixer/BSPlus interactions manually in game. Record the game version and distinguish automated checks from VR checks.
 
 ## Commit & Pull Request Guidelines
-The repository has no commits yet, so no historical message convention exists. Use short, imperative commit subjects, such as `Fix controller cleanup on shutdown`. Pull requests should describe the change, link relevant issues, and record build configuration, game version, and manual checks. Include screenshots for visible UI changes. Keep local installation paths, game DLLs, and generated `bin/` and `obj/` files out of commits.
+Use short imperative subjects, such as `Fix BPM boundary conversion`; no established historical convention was identified during initial inspection. Describe changed behavior, link relevant issues, and include build/test results. Include screenshots for visible UI changes. Keep local game paths, DLL dependencies, and generated outputs out of commits. Synchronize manifest and assembly versions for releases.
