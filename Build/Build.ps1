@@ -32,7 +32,7 @@ $stage = Join-Path $artifacts ('.staging/' + [Guid]::NewGuid().ToString('N'))
 $package = Join-Path $stage $packageName
 New-Item -ItemType Directory -Force (Join-Path $package 'Plugins') | Out-Null
 Copy-Item -LiteralPath $dll -Destination (Join-Path $package 'Plugins/AdvancedPractice.dll')
-foreach ($name in @('README.md','LICENSE','THIRD_PARTY_NOTICES.md')) {
+foreach ($name in @('README.md','README-ko.md','LICENSE','THIRD_PARTY_NOTICES.md')) {
     Copy-Item -LiteralPath (Join-Path $repo $name) -Destination $package
 }
 @{ GameVersion = $GameVersion; Support = $tier; LegatoPackage = '0.1.1'; SourceApi = '1.40.8'; Configuration = $Configuration } |
@@ -40,7 +40,7 @@ foreach ($name in @('README.md','LICENSE','THIRD_PARTY_NOTICES.md')) {
 # Ship the exact corresponding source alongside the binary. Never include game DLLs or local paths.
 $source = Join-Path $stage 'source'
 New-Item -ItemType Directory -Force $source | Out-Null
-foreach ($name in @('AdvancedPractice.csproj','Directory.Build.props','Plugin.cs','AdvancedPracticeController.cs','manifest.json','README.md','AGENTS.md','LICENSE','THIRD_PARTY_NOTICES.md','.gitignore')) {
+foreach ($name in @('AdvancedPractice.csproj','Directory.Build.props','Plugin.cs','AdvancedPracticeController.cs','manifest.json','README.md','README-ko.md','AGENTS.md','LICENSE','THIRD_PARTY_NOTICES.md','.gitignore')) {
     Copy-Item -LiteralPath (Join-Path $repo $name) -Destination $source
 }
 foreach ($directory in @('Build','Compatibility','Configuration','Models','Views','Properties','Tests')) {
