@@ -1,0 +1,24 @@
+<vertical spacing='0' horizontal-fit='Unconstrained' vertical-fit='PreferredSize' child-alignment='UpperCenter' child-control-width='true' child-expand-width='true' child-control-height='true' child-expand-height='false'>
+  <text text='Song Start (beat)' font-size='3.5' align='Center' min-height='4' preferred-height='4'/>
+  <slider-setting id='beat-slider' text='' value='beat' formatter='beat-format' min='0' max='1000' increment='1' apply-on-change='false' min-height='6' preferred-height='6'/>
+  <text id='start-info-text' text='~start-info' font-size='3' align='Center' min-height='4' preferred-height='4'/>
+  <text text='Speed (BPM)' font-size='3.5' align='Center' min-height='4' preferred-height='4'/>
+  <slider-setting id='speed-slider' text='' value='speed' formatter='speed-format' min='1' max='1000' increment='1' apply-on-change='false' min-height='6' preferred-height='6'/>
+  <text id='speed-info-text' text='~speed-info' font-size='3' align='Center' min-height='4' preferred-height='4'/>
+  <horizontal spacing='4' horizontal-fit='Unconstrained' vertical-fit='Unconstrained' child-alignment='MiddleCenter' child-control-width='true' child-expand-width='false' child-control-height='true' child-expand-height='false' min-height='5' preferred-height='5'>
+    <horizontal spacing='0.5' horizontal-fit='Unconstrained' vertical-fit='Unconstrained' child-control-width='true' child-expand-width='false' child-control-height='true' child-expand-height='false' min-width='25' preferred-width='25' min-height='5' preferred-height='5'>
+      <button text='-10' on-click='minus-ten' font-size='3' horizontal-fit='Unconstrained' vertical-fit='Unconstrained' pad='0' min-width='8' preferred-width='8' min-height='4.5' preferred-height='4.5'/>
+      <button text='-5' on-click='minus-five' font-size='3' horizontal-fit='Unconstrained' vertical-fit='Unconstrained' pad='0' min-width='8' preferred-width='8' min-height='4.5' preferred-height='4.5'/>
+      <button text='-1' on-click='minus-one' font-size='3' horizontal-fit='Unconstrained' vertical-fit='Unconstrained' pad='0' min-width='8' preferred-width='8' min-height='4.5' preferred-height='4.5'/>
+    </horizontal>
+    <horizontal spacing='0.5' horizontal-fit='Unconstrained' vertical-fit='Unconstrained' child-control-width='true' child-expand-width='false' child-control-height='true' child-expand-height='false' min-width='25' preferred-width='25' min-height='5' preferred-height='5'>
+      <button text='+1' on-click='plus-one' font-size='3' horizontal-fit='Unconstrained' vertical-fit='Unconstrained' pad='0' min-width='8' preferred-width='8' min-height='4.5' preferred-height='4.5'/>
+      <button text='+5' on-click='plus-five' font-size='3' horizontal-fit='Unconstrained' vertical-fit='Unconstrained' pad='0' min-width='8' preferred-width='8' min-height='4.5' preferred-height='4.5'/>
+      <button text='+10' on-click='plus-ten' font-size='3' horizontal-fit='Unconstrained' vertical-fit='Unconstrained' pad='0' min-width='8' preferred-width='8' min-height='4.5' preferred-height='4.5'/>
+    </horizontal>
+  </horizontal>
+  <horizontal spacing='2' horizontal-fit='Unconstrained' vertical-fit='Unconstrained' child-control-width='true' child-expand-width='false' child-control-height='true' child-expand-height='false' min-height='7' preferred-height='7'>
+    <slider-setting id='njs-slider' text='NJS (base)' value='njs' min='1' max='50' increment='1' apply-on-change='false' min-width='85' preferred-width='85' min-height='7' preferred-height='7'/>
+    <button text='Reset NJS' on-click='reset-njs' font-size='2.5' horizontal-fit='Unconstrained' vertical-fit='Unconstrained' pad='0' min-width='18' preferred-width='18' min-height='5' preferred-height='5'/>
+  </horizontal>
+</vertical>

@@ -1,0 +1,1 @@
+<vertical><increment-setting text='NJS step' value='njs-step' increment='0.1' min='0.1' max='10' apply-on-change='true'/></vertical>

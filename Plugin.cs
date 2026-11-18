@@ -1,61 +1,43 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
+using HarmonyLib;
 using IPA;
 using IPA.Config;
 using IPA.Config.Stores;
-using UnityEngine.SceneManagement;
-using UnityEngine;
-using IPALogger = IPA.Logging.Logger;
+using IPA.Loader;
+using System.Linq;
+using System.Reflection;
+using BeatSaberMarkupLanguage.Settings;
+using AdvancedPractice.Configuration;
 
 namespace AdvancedPractice
 {
-
     [Plugin(RuntimeOptions.SingleStartInit)]
     public class Plugin
     {
-        internal static Plugin Instance { get; private set; }
-        internal static IPALogger Log { get; private set; }
-
+        internal static IPA.Logging.Logger Log { get; private set; }
+        private Harmony harmony;
         [Init]
-        /// <summary>
-        /// Called when the plugin is first loaded by IPA (either when the game starts or when the plugin is enabled if it starts disabled).
-        /// [Init] methods that use a Constructor or called before regular methods like InitWithConfig.
-        /// Only use [Init] with one Constructor.
-        /// </summary>
-        public void Init(IPALogger logger)
+        public void Init(IPA.Logging.Logger logger, Config config)
         {
-            Instance = this;
             Log = logger;
-            Log.Info("AdvancedPractice initialized.");
+            PluginConfig.Instance = config.Generated<PluginConfig>();
         }
-
-        #region BSIPA Config
-        //Uncomment to use BSIPA's config
-        /*
-        [Init]
-        public void InitWithConfig(Config conf)
-        {
-            Configuration.PluginConfig.Instance = conf.Generated<Configuration.PluginConfig>();
-            Log.Debug("Config loaded");
-        }
-        */
-        #endregion
-
         [OnStart]
-        public void OnApplicationStart()
+        public void Start()
         {
-            Log.Debug("OnApplicationStart");
-            new GameObject("AdvancedPracticeController").AddComponent<AdvancedPracticeController>();
-
+            if (PluginManager.EnabledPlugins.Any(p => p.Id == "PracticePlugin"))
+            {
+                Log.Error("Remove PracticePlugin before enabling AdvancedPractice. No patches applied.");
+                return;
+            }
+            harmony = new Harmony("AdvancedPractice");
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
+            BSMLSettings.Instance.AddSettingsMenu("AdvancedPractice", "AdvancedPractice.Views.Settings.bsml", PluginConfig.Instance);
         }
-
         [OnExit]
-        public void OnApplicationQuit()
+        public void Exit()
         {
-            Log.Debug("OnApplicationQuit");
-
+            harmony?.UnpatchSelf();
+            if (harmony != null) BSMLSettings.Instance.RemoveSettingsMenu(PluginConfig.Instance);
         }
     }
 }
