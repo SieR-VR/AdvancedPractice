@@ -4,6 +4,8 @@
     <TargetFramework>net48</TargetFramework>
     <LangVersion>10.0</LangVersion>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <LegatoSourceVersion>1.40.8</LegatoSourceVersion>

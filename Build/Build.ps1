@@ -22,6 +22,8 @@ if ($NoRestore) { $buildArgs += '--no-restore' }
 & dotnet @buildArgs
 if ($LASTEXITCODE -ne 0) { throw "Build failed for $GameVersion." }
 $dll = Join-Path $repo "bin/$Configuration/$GameVersion/AdvancedPractice.dll"
+$pdb = [IO.Path]::ChangeExtension($dll, '.pdb')
+if (!(Test-Path -LiteralPath $pdb)) { throw "Debug symbols are missing: $pdb" }
 & "$PSScriptRoot/Verify-GameApi.ps1" -GameDirectory $GameDirectory -GameVersion $GameVersion -PluginPath $dll
 $version = (Get-Content -Raw (Join-Path $repo 'manifest.json') | ConvertFrom-Json).version
 $tier = if ($GameVersion -in @('1.44.1','1.40.8')) { 'build-verified; VR unverified' } else { 'provisional; VR unverified' }
@@ -32,14 +34,12 @@ $stage = Join-Path $artifacts ('.staging/' + [Guid]::NewGuid().ToString('N'))
 $package = Join-Path $stage $packageName
 New-Item -ItemType Directory -Force (Join-Path $package 'Plugins') | Out-Null
 Copy-Item -LiteralPath $dll -Destination (Join-Path $package 'Plugins/AdvancedPractice.dll')
-foreach ($name in @('README.md','README-ko.md','LICENSE','THIRD_PARTY_NOTICES.md')) {
-    Copy-Item -LiteralPath (Join-Path $repo $name) -Destination $package
-}
-@{ GameVersion = $GameVersion; Support = $tier; LegatoPackage = '0.1.1'; SourceApi = '1.40.8'; Configuration = $Configuration } |
-    ConvertTo-Json | Set-Content (Join-Path $package 'BUILD-INFO.json')
-# Ship the exact corresponding source alongside the binary. Never include game DLLs or local paths.
+Copy-Item -LiteralPath $pdb -Destination (Join-Path $package 'Plugins/AdvancedPractice.pdb')
+# Publish corresponding source as a separate release asset, not inside the install ZIP.
 $source = Join-Path $stage 'source'
 New-Item -ItemType Directory -Force $source | Out-Null
+@{ GameVersion = $GameVersion; Support = $tier; LegatoPackage = '0.1.1'; SourceApi = '1.40.8'; Configuration = $Configuration } |
+    ConvertTo-Json | Set-Content (Join-Path $source 'BUILD-INFO.json')
 foreach ($name in @('AdvancedPractice.csproj','Directory.Build.props','Plugin.cs','AdvancedPracticeController.cs','manifest.json','README.md','README-ko.md','AGENTS.md','LICENSE','THIRD_PARTY_NOTICES.md','.gitignore')) {
     Copy-Item -LiteralPath (Join-Path $repo $name) -Destination $source
 }
@@ -59,12 +59,14 @@ foreach ($folder in $assets.packageFolders.PSObject.Properties.Name) {
     $candidate = Join-Path $folder 'legatobs/0.1.1/build'
     if (Test-Path -LiteralPath $candidate) { $legatoBuild = $candidate; break }
 }
-if (!$legatoBuild) { throw 'The exact Legato source package is required for corresponding-source.zip. Restore packages first.' }
+if (!$legatoBuild) { throw 'The exact Legato source package is required for the source release asset. Restore packages first.' }
 $thirdParty = Join-Path $source 'ThirdParty/Legato'
 New-Item -ItemType Directory -Force $thirdParty | Out-Null
 Copy-Item -LiteralPath $legatoBuild -Destination $thirdParty -Recurse
-Compress-Archive -Path (Join-Path $source '*') -DestinationPath (Join-Path $package 'corresponding-source.zip') -Force
+$sourceZip = Join-Path $artifacts "$packageName-source.zip"
+Compress-Archive -Path (Join-Path $source '*') -DestinationPath $sourceZip -Force
 $zip = Join-Path $artifacts "$packageName.zip"
 Compress-Archive -Path (Join-Path $package '*') -DestinationPath $zip -Force
 Write-Host "Package: $zip"
+Write-Host "Corresponding source: $sourceZip"
 Write-Host "Support: $tier. No game files were installed or modified."

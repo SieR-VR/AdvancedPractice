@@ -11,15 +11,17 @@ $main = [Mono.Cecil.AssemblyDefinition]::ReadAssembly((Join-Path $GameDirectory 
 try {
     $view = $main.MainModule.Types | Where-Object Name -EQ 'PracticeViewController'
     if (!$view) { throw 'PracticeViewController was not found.' }
-    $expectedFields = @('_songStartSlider','_speedSlider','_playButton','_maxStartSongTime','_playerDataModel')
+    $expectedFields = @('_songStartSlider','_speedSlider','_playButton','_maxStartSongTime','_playerDataModel','_getAudioClipTask','_audioClip')
     if ($GameVersion -eq '1.29.0') { $expectedFields += '_difficultyBeatmap' }
     else { $expectedFields += @('_beatmapKey','_beatmapLevel','_beatmapLevelsModel','_beatmapLevelsEntitlementModel') }
     foreach ($name in $expectedFields) {
         if (!($view.Fields | Where-Object Name -EQ $name)) { throw "PracticeViewController.$name is unavailable." }
     }
-    foreach ($name in @('DidActivate','HandlePlayButtonPressed')) {
+    foreach ($name in @('DidActivate','DidDeactivate','HandlePlayButtonPressed')) {
         if (!($view.Methods | Where-Object Name -EQ $name)) { throw "Harmony target PracticeViewController.$name is unavailable." }
     }
+    $preview = @($view.Methods | Where-Object { $_.Name -eq 'PlayPreview' -and !$_.IsStatic -and $_.Parameters.Count -eq 0 -and $_.ReturnType.FullName -eq 'System.Void' })
+    if ($preview.Count -ne 1) { throw 'PracticeViewController.PlayPreview() must be an instance void method with no arguments.' }
     $installer = $main.MainModule.Types | Where-Object Name -EQ 'GameplayCoreInstaller'
     if (!($installer.Methods | Where-Object Name -EQ 'InstallBindings') -or !($installer.Fields | Where-Object Name -EQ '_sceneSetupData')) {
         throw 'GameplayCoreInstaller patch contract changed.'

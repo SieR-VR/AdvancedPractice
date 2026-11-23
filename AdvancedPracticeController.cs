@@ -40,6 +40,8 @@ namespace AdvancedPractice
         private CancellationTokenSource cancellation;
         private float beat, speed, njs, defaultNjs, maxTime;
         private bool ready, syncing;
+        private bool previewPending;
+        private float previewDueTime;
         internal static PracticeSettings SelectedSettings;
         internal static float SelectedNjs;
         internal static string SelectedLevel;
@@ -48,7 +50,21 @@ namespace AdvancedPractice
         [UIComponent("njs-slider")] private SliderSetting njsSlider = null;
         [UIComponent("start-info-text")] private TextMeshProUGUI startInfoText = null;
         [UIComponent("speed-info-text")] private TextMeshProUGUI speedInfoText = null;
-        [UIValue("beat")] public float Beat { get => beat; set { if (syncing || !ready) return; beat = Mathf.Clamp(Mathf.Round(value), 0, (float)Math.Floor(timeline.ToBeat(maxTime))); Sync(); } }
+        [UIValue("beat")]
+        public float Beat
+        {
+            get => beat;
+            set
+            {
+                if (syncing || !ready) return;
+                float next = Mathf.Clamp(Mathf.Round(value), 0, (float)Math.Floor(timeline.ToBeat(maxTime)));
+                if (Mathf.Approximately(beat, next)) return;
+                beat = next;
+                Sync();
+                previewPending = true;
+                previewDueTime = UnityEngine.Time.unscaledTime + .15f;
+            }
+        }
         [UIValue("speed")] public float Speed { get => speed; set { if (syncing || !ready) return; speed = value; Sync(); } }
         [UIValue("njs")] public float Njs { get => njs; set { if (syncing || !ready) return; njs = Mathf.Clamp(value, 1, 50); Sync(); } }
         private float Time => (float)timeline.ToSeconds(beat);
@@ -67,6 +83,7 @@ namespace AdvancedPractice
 
         internal async Task Load(PracticeViewController owner)
         {
+            CancelPreview();
             cancellation?.Cancel();
             cancellation = new CancellationTokenSource();
             var token = cancellation.Token;
@@ -184,7 +201,18 @@ namespace AdvancedPractice
         private void LateUpdate()
         {
             if (ready && noteHint != null && noteHint.activeSelf) PositionNoteHint();
+            if (!ready || !previewPending || UnityEngine.Time.unscaledTime < previewDueTime) return;
+            try
+            {
+                if (PracticePreview.TryPlay(view, Time) != PreviewResult.Loading) CancelPreview();
+            }
+            catch (Exception exception)
+            {
+                CancelPreview();
+                Plugin.Log.Error(exception);
+            }
         }
+        internal void CancelPreview() => previewPending = false;
         private void UpdateNoteHint()
         {
             var firstNotes = OpeningNotes.FindForHands(notes, Time, n => n.time, n => n.colorType == ColorType.ColorA ? 0 : n.colorType == ColorType.ColorB ? 1 : -1);
@@ -342,6 +370,7 @@ namespace AdvancedPractice
         }
         internal void PreparePlay()
         {
+            CancelPreview();
             if (!ready) return;
             Sync();
             SelectedSettings = view.practiceSettings;
@@ -349,6 +378,7 @@ namespace AdvancedPractice
         }
         private void OnDisable()
         {
+            CancelPreview();
             cancellation?.Cancel();
             ready = false;
             UnbindSliders();
@@ -376,6 +406,11 @@ namespace AdvancedPractice
     internal static class PlayPatch
     {
         private static void Prefix(PracticeViewController __instance) => __instance.GetComponent<AdvancedPracticeController>()?.PreparePlay();
+    }
+    [HarmonyPatch(typeof(PracticeViewController), "DidDeactivate")]
+    internal static class PreviewDeactivationPatch
+    {
+        private static void Prefix(PracticeViewController __instance) => __instance.GetComponent<AdvancedPracticeController>()?.CancelPreview();
     }
     [HarmonyPatch(typeof(GameplayCoreInstaller), "InstallBindings")]
     internal static class GameplayPatch

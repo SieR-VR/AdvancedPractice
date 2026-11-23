@@ -8,7 +8,7 @@ AdvancedPractice extends Beat Saber's practice setup screen. `Plugin.cs` owns BS
 ## Build, Test, and Development Commands
 Use PowerShell 7 and .NET 10 SDK. Supply the exact target game's installation with BSIPA and matching BSML references.
 
-- `pwsh ./Build/Build.ps1 -GameVersion 1.44.1 -GameDirectory 'D:\Games\Beat Saber 1.44.1'` builds, checks API contracts and the embedded manifest, and packages the plugin with corresponding source.
+- `pwsh ./Build/Build.ps1 -GameVersion 1.44.1 -GameDirectory 'D:\Games\Beat Saber 1.44.1'` builds, checks API contracts and the embedded manifest, and creates a DLL/PDB installation ZIP and a separate corresponding-source ZIP.
 - Add `-ModReferencesDirectory 'D:\Refs\Plugins'` for separate BSML references.
 - `dotnet run --project Tests/AdvancedPractice.Tests.csproj -c Release` checks timing, speed, selection restoration, and per-hand note selection.
 - `pwsh ./Tests/BuildProfiles.Tests.ps1` validates all five Legato profile configurations without compiling provisional targets.

@@ -6,7 +6,7 @@ Beat Saber **1.44.1**을 우선 지원하는 연습 시작 화면 확장 플러�
 
 ## 기능
 
-- **Song Start:** 매핑 툴의 beat(0부터 시작)를 1 단위로 지정합니다. BPM 변경 이벤트를 반영한 시작 시각을 소수점 세 자리 seconds로 표시하고 해당 위치 BPM을 표시합니다.
+- **Song Start:** 매핑 툴의 beat(0부터 시작)를 1 단위로 지정합니다. BPM 변경 이벤트를 반영한 시작 시각을 소수점 세 자리 seconds로 표시하고 해당 위치 BPM을 표시합니다. 시작 beat를 변경하면 기본 Practice Mode의 미리듣기 함수를 사용해 해당 구간을 재생합니다. 드래그 중에는 마지막 변경 후 0.15초 뒤에 반영하고, 곡 로딩 중 선택한 위치는 로딩 완료 후 재생합니다.
 - **First notes:** Play 버튼 왼쪽의 `Next L / R`에 각 손의 다음 노트를 따로 표시합니다. 두 노트의 등장 시각이 달라도 왼손·오른손 슬롯을 유지하며, 해당 손에 남은 노트가 없으면 `None`으로 표시합니다. 폭탄·체인 링크는 제외하고 무방향 노트는 점으로 표시합니다. 기본 빨강/파랑 색과 맵 원본 방향을 사용하므로 커스텀 색상·왼손 모드·게임플레이 미러 변환은 반영하지 않습니다.
 - **Speed:** 시작 위치의 원본 BPM을 기준으로 목표 BPM과 배속 %를 표시합니다. `-10`, `-5`, `-1` 및 `+1`, `+5`, `+10` 버튼을 제공합니다. 지원 배속은 10–500%입니다. 시작 beat를 바꾸면 목표 BPM을 유지하면서 %를 다시 계산하고 범위에 맞게 제한합니다. 재생 중에는 선택한 배속이 고정되므로 이후 BPM 변화에도 배속은 같습니다.
 - **NJS:** 기본 NJS를 1–50 범위로 변경합니다. Mod Settings → AdvancedPractice에서 단위를 바꿀 수 있으며 다음 연습 화면 진입 시 적용됩니다. 기본값은 1입니다.
@@ -31,7 +31,7 @@ Beat Saber **1.44.1**을 우선 지원하는 연습 시작 화면 확장 플러�
 
 1. 대상 게임 버전에 맞는 BSIPA와 BeatSaberMarkupLanguage를 설치합니다. 1.44.1은 BSIPA 4.3.7+, BSML 1.14.1+가 필요합니다.
 2. **PracticePlugin을 제거합니다.** 함께 로드되면 AdvancedPractice는 오류를 기록하고 기능을 활성화하지 않습니다.
-3. 게임 버전과 일치하는 `artifacts/AdvancedPractice-0.2.0-bs<버전>.zip`의 `Plugins` 폴더를 게임 폴더에 복사합니다. 직접 빌드한 DLL은 `bin/Release/<버전>/AdvancedPractice.dll`에 있습니다.
+3. 게임 버전과 일치하는 `artifacts/AdvancedPractice-0.2.0-bs<버전>.zip`의 `Plugins` 폴더를 게임 폴더에 복사합니다. 설치 ZIP에는 `Plugins/AdvancedPractice.dll`과 해당 빌드의 portable PDB만 들어 있습니다. 직접 빌드한 파일은 `bin/Release/<버전>/`에 있습니다.
 4. 게임을 다시 시작하고 곡 선택 화면에서 Practice Mode에 진입합니다.
 
 이 버전은 요청한 **곡 시작 전 연습 설정 화면**을 구현합니다. 원본 PracticePlugin의 일시정지 seek/loop, 실패 시간 표시, 에너지 보정 기능은 포함하지 않습니다. 게임 폴더에는 자동 배포하지 않습니다.
@@ -67,13 +67,14 @@ Legato CLI를 다시 설정할 때는 설치된 CLI를 사용합니다. .NET 8 �
 
 ## 라이선스
 
-Legato 소스가 DLL에 포함되므로 배포 라이선스는 GPLv3입니다. `LICENSE`와 `THIRD_PARTY_NOTICES.md`를 확인하세요. 생성되는 배포 ZIP은 정확한 빌드 소스와 Legato 0.1.1의 소스를 `corresponding-source.zip`에 포함합니다. 게임/BSIPA/BSML 참조 DLL과 개인 설정 파일은 배포하지 않습니다.
+Legato 소스가 DLL에 포함되므로 배포 라이선스는 GPLv3입니다. `LICENSE`와 `THIRD_PARTY_NOTICES.md`를 확인하세요. 설치 ZIP과 함께 같은 버전의 `AdvancedPractice-<플러그인 버전>-bs<게임 버전>-source.zip`을 별도 릴리스 파일로 게시합니다. 소스 ZIP에는 정확한 빌드 소스, Legato 0.1.1 소스, 양쪽 README, 라이선스 고지 및 빌드 정보가 들어 있으며 설치 ZIP에는 넣지 않습니다. 게임/BSIPA/BSML 참조 DLL과 개인 설정 파일은 배포하지 않습니다.
 
 ## 게임 내 확인 항목
 
 VR 실행 검증은 아직 수행되지 않았습니다. 실제 사용 전 다음을 확인합니다.
 
 - 일반 맵과 BPM 변경 맵에서 beat, seconds, BPM이 매핑 툴과 일치하는지 확인합니다.
+- 시작 beat를 한 칸 변경하거나 빠르게 드래그했을 때 해당 구간이 재생되고, 로딩 중 선택도 반영되며, 화면을 나가면 재생 대기가 취소되는지 확인합니다.
 - Speed 버튼 및 슬라이더 변경 후 표시 %와 실제 재생 속도를 확인합니다.
 - VNJS 변화 구간과 easing 구간에서 표시 NJS 및 변경된 기본 NJS를 확인합니다.
 - Mod Settings 단위 변경 후 연습 화면을 다시 열어 NJS 간격을 확인합니다.

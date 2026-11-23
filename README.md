@@ -6,7 +6,7 @@ A practice setup screen extension for Beat Saber, primarily targeting **1.44.1**
 
 ## Features
 
-- **Song Start:** Choose a zero-based beat in increments of 1, as in mapping tools. The display shows the corresponding start time in seconds to three decimal places and the BPM at that position, accounting for BPM changes.
+- **Song Start:** Choose a zero-based beat in increments of 1, as in mapping tools. The display shows the corresponding start time in seconds to three decimal places and the BPM at that position, accounting for BPM changes. Changing the start beat previews that part of the song using the original Practice Mode preview function. Updates are debounced by 0.15 seconds while dragging, and selections made during audio loading play once the clip is ready.
 - **First notes:** `Next L / R`, to the left of Play, shows each hand's next note independently, even when they occur at different times. A slot displays `None` when that hand has no notes remaining. Bombs and chain links are excluded; any-direction notes use a dot. Hints use default red/blue colors and the map's original directions, without custom colors, left-handed mode, or gameplay mirror transformations.
 - **Speed:** Set a target BPM relative to the map BPM at the selected start position. The slider and `-10`, `-5`, `-1`, `+1`, `+5`, `+10` buttons update the target BPM and speed percentage. Supported speed is 10–500%. Changing the start beat preserves the target BPM, recalculates the percentage, and clamps it to the supported range. During playback, the selected multiplier stays fixed across subsequent BPM changes.
 - **NJS:** Adjust base NJS from 1 to 50. Change the step in Mod Settings → AdvancedPractice; it takes effect the next time you open the practice screen. The default step is 1.
@@ -31,7 +31,7 @@ A newly selected chart starts at its original starting BPM and 100% speed, witho
 
 1. Install BSIPA and BeatSaberMarkupLanguage versions compatible with your game. Beat Saber 1.44.1 requires BSIPA 4.3.7+ and BSML 1.14.1+.
 2. **Remove PracticePlugin.** If both plugins are loaded, AdvancedPractice logs an error and does not activate its features.
-3. Copy the `Plugins` folder from the matching `artifacts/AdvancedPractice-0.2.0-bs<version>.zip` into the game folder. A directly built DLL is located at `bin/Release/<version>/AdvancedPractice.dll`.
+3. Copy the `Plugins` folder from the matching `artifacts/AdvancedPractice-0.2.0-bs<version>.zip` into the game folder. The installation ZIP contains only `Plugins/AdvancedPractice.dll` and its matching portable PDB. Direct build outputs are located at `bin/Release/<version>/`.
 4. Restart the game and enter Practice Mode from song selection.
 
 This plugin implements the **practice setup screen before a song starts**. PracticePlugin's pause-menu seeking/looping, failure-time display, and energy adjustments are not included. Build scripts do not deploy into the game automatically.
@@ -67,13 +67,14 @@ Use the installed Legato CLI if you need to reconfigure the integration. If .NET
 
 ## License
 
-Legato source is compiled into the plugin, so distribution is under GPLv3. See [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Generated release ZIPs include the exact build source and Legato 0.1.1 source in `corresponding-source.zip`. Game, BSIPA, and BSML reference DLLs and personal configuration files are excluded.
+Legato source is compiled into the plugin, so distribution is under GPLv3. See [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Publish the matching `AdvancedPractice-<plugin-version>-bs<game-version>-source.zip` alongside each installation ZIP. This separate source asset includes the exact build source, Legato 0.1.1 source, both READMEs, license notices, and build metadata; these files are not placed in the installation ZIP. Game, BSIPA, and BSML reference DLLs and personal configuration files are excluded.
 
 ## In-game validation
 
 VR runtime validation has not yet been performed. Before relying on a build, check:
 
 - Beat, seconds, and BPM against a mapping tool on constant-BPM and BPM-changing maps.
+- Song preview after one-beat changes, rapid dragging, and selections made during audio loading; leaving the screen cancels pending playback.
 - Displayed speed percentage and actual playback speed after slider and button changes.
 - NJS display and base NJS changes across VNJS events and easing segments.
 - NJS step changes after reopening the practice screen.
