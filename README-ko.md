@@ -4,6 +4,10 @@
 
 Beat Saber **1.44.1**을 우선 지원하는 연습 시작 화면 확장 플러그인입니다. [LegatoBS 0.1.1](https://github.com/ScoreSaber/legato)을 소스 포함 방식으로 사용합니다. 원본 참고: [denpadokei/PracticePlugin](https://github.com/denpadokei/PracticePlugin). 원본 코드를 포함하지 않는 독립 구현입니다.
 
+## AI를 사용한 코드 생성
+
+이 저장소의 코드는 OpenAI Codex를 포함한 AI 코딩 도구를 사용해 생성·수정되었습니다. 빌드 및 자동 테스트 통과가 모든 기능의 게임 내 검증을 의미하지는 않습니다. 버전별 지원 상태와 검증 항목은 아래 내용을 확인하세요.
+
 ## 기능
 
 - **Song Start:** 매핑 툴의 beat(0부터 시작)를 1 단위로 지정합니다. BPM 변경 이벤트를 반영한 시작 시각을 소수점 세 자리 seconds로 표시하고 해당 위치 BPM을 표시합니다. 시작 beat를 변경하면 기본 Practice Mode의 미리듣기 함수를 사용해 해당 구간을 재생합니다. 드래그 중에는 마지막 변경 후 0.15초 뒤에 반영하고, 곡 로딩 중 선택한 위치는 로딩 완료 후 재생합니다.

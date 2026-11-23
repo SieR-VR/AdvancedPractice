@@ -4,6 +4,10 @@
 
 A practice setup screen extension for Beat Saber, primarily targeting **1.44.1**. It source-includes [LegatoBS 0.1.1](https://github.com/ScoreSaber/legato) for compatibility across game versions. Inspired by [denpadokei/PracticePlugin](https://github.com/denpadokei/PracticePlugin); this is an independent implementation without PracticePlugin source code.
 
+## AI-generated code
+
+Code in this repository was generated and modified using AI coding tools, including OpenAI Codex. Build and automated test results do not establish that every feature has been verified in game; see the version support and validation sections below.
+
 ## Features
 
 - **Song Start:** Choose a zero-based beat in increments of 1, as in mapping tools. The display shows the corresponding start time in seconds to three decimal places and the BPM at that position, accounting for BPM changes. Changing the start beat previews that part of the song using the original Practice Mode preview function. Updates are debounced by 0.15 seconds while dragging, and selections made during audio loading play once the clip is ready.
