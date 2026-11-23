@@ -2,11 +2,11 @@
 
 [English](README.md)
 
-Beat Saber **1.44.1**을 우선 지원하는 연습 시작 화면 확장 플러그인입니다. [LegatoBS 0.1.1](https://github.com/ScoreSaber/legato)을 소스 포함 방식으로 사용합니다. 원본 참고: [denpadokei/PracticePlugin](https://github.com/denpadokei/PracticePlugin). 원본 코드를 포함하지 않는 독립 구현입니다.
+Beat Saber용 고급 연습 플러그인입니다.
 
-## AI를 사용한 코드 생성
+게임 버전 간 호환성을 위해 [LegatoBS 0.1.1](https://github.com/ScoreSaber/legato)을 소스 포함 방식으로 사용합니다.
 
-이 저장소의 코드는 OpenAI Codex를 포함한 AI 코딩 도구를 사용해 생성·수정되었습니다. 빌드 및 자동 테스트 통과가 모든 기능의 게임 내 검증을 의미하지는 않습니다. 버전별 지원 상태와 검증 항목은 아래 내용을 확인하세요.
+[denpadokei/PracticePlugin](https://github.com/denpadokei/PracticePlugin)을 바탕으로 제작했지만, PracticePlugin의 포크는 아닙니다.
 
 ## 기능
 
@@ -19,17 +19,14 @@ Beat Saber **1.44.1**을 우선 지원하는 연습 시작 화면 확장 플러�
 
 처음 선택한 맵은 이전 곡의 배속을 상속하지 않고 시작 위치 원본 BPM의 100%로 열립니다. 선택한 beat·목표 BPM·NJS는 게임 실행 중 곡·특성·난이도별로 유지됩니다. 연습 종료 후 같은 맵으로 돌아오면 마지막 선택값을 복원하며, 게임을 다시 시작하면 초기화됩니다.
 
-## 버전별 지원 상태
+## 버전 지원
 
-| 게임 버전 | Legato 프로필 | 상태 |
-| --- | --- | --- |
-| 1.44.1 | 1.42.0 | 우선 지원: 실제 게임 DLL 및 BSML 1.14.1 빌드·API·manifest 검증 완료 |
-| 1.40.8 | 1.40.0 | 기존 지원: 실제 게임 DLL 및 BSML 1.12.5 재검증 완료 |
-| 1.29.0 | 1.29.0 | 예비 지원: 호환 분기·빌드 설정만 검증, 실제 참조 빌드 미검증 |
-| 1.37.1 | 1.37.1 | 예비 지원: 호환 분기·빌드 설정만 검증, 실제 참조 빌드 미검증 |
-| 1.38.0 | 1.38.0 | 예비 지원: 호환 분기·빌드 설정만 검증, 실제 참조 빌드 미검증 |
+이 플러그인은 Beat Saber 플러그인의 버전 호환성 계층인 [ScoreSaber/legato](https://github.com/ScoreSaber/legato)를 기반으로 합니다.
 
-모든 버전의 VR 실행 검증은 별도로 필요합니다. **버전별 DLL을 따로 빌드**하며 하나의 DLL을 모든 버전에 공통 설치하는 방식이 아닙니다. 구버전에서는 기본 NJS를 조정하고 표준 VNJS 이벤트 표시는 제공하지 않습니다. 1.29.0의 기존 difficulty beatmap 로더, 1.37.1의 로더 인수, 구 BSML의 소문자 필드/싱글턴 API를 `Compatibility/`에서 분리합니다.
+| 게임 버전 | Legato 프로필 |
+| --- | --- |
+| 1.42.0–1.44.1 | 1.42.0 |
+| 1.40.0–1.40.8 | 1.40.0 |
 
 ## 설치
 
@@ -49,11 +46,8 @@ Beat Saber **1.44.1**을 우선 지원하는 연습 시작 화면 확장 플러�
 pwsh ./Build/Build.ps1 -GameDirectory 'D:\Games\Beat Saber 1.44.1'
 # BSML 참조를 게임에 설치하지 않고 별도로 준비한 경우:
 pwsh ./Build/Build.ps1 -GameVersion 1.44.1 -GameDirectory 'D:\Games\Beat Saber 1.44.1' -ModReferencesDirectory 'D:\Refs\1.44.1\Plugins'
-# 기존 버전 / 예비 버전도 각각 그 버전의 참조 폴더로 빌드합니다.
+# 다른 대상도 해당 버전의 참조 폴더로 빌드합니다.
 pwsh ./Build/Build.ps1 -GameVersion 1.40.8 -GameDirectory 'D:\Games\Beat Saber 1.40.8'
-pwsh ./Build/Build.ps1 -GameVersion 1.29.0 -GameDirectory 'D:\Games\Beat Saber 1.29.0'
-pwsh ./Build/Build.ps1 -GameVersion 1.37.1 -GameDirectory 'D:\Games\Beat Saber 1.37.1'
-pwsh ./Build/Build.ps1 -GameVersion 1.38.0 -GameDirectory 'D:\Games\Beat Saber 1.38.0'
 
 dotnet run --project Tests/AdvancedPractice.Tests.csproj -c Release
 pwsh ./Tests/BuildProfiles.Tests.ps1
@@ -73,15 +67,6 @@ Legato CLI를 다시 설정할 때는 설치된 CLI를 사용합니다. .NET 8 �
 
 Legato 소스가 DLL에 포함되므로 배포 라이선스는 GPLv3입니다. `LICENSE`와 `THIRD_PARTY_NOTICES.md`를 확인하세요. 설치 ZIP과 함께 같은 버전의 `AdvancedPractice-<플러그인 버전>-bs<게임 버전>-source.zip`을 별도 릴리스 파일로 게시합니다. 소스 ZIP에는 정확한 빌드 소스, Legato 0.1.1 소스, 양쪽 README, 라이선스 고지 및 빌드 정보가 들어 있으며 설치 ZIP에는 넣지 않습니다. 게임/BSIPA/BSML 참조 DLL과 개인 설정 파일은 배포하지 않습니다.
 
-## 게임 내 확인 항목
+## AI를 사용한 코드 생성
 
-VR 실행 검증은 아직 수행되지 않았습니다. 실제 사용 전 다음을 확인합니다.
-
-- 일반 맵과 BPM 변경 맵에서 beat, seconds, BPM이 매핑 툴과 일치하는지 확인합니다.
-- 시작 beat를 한 칸 변경하거나 빠르게 드래그했을 때 해당 구간이 재생되고, 로딩 중 선택도 반영되며, 화면을 나가면 재생 대기가 취소되는지 확인합니다.
-- Speed 버튼 및 슬라이더 변경 후 표시 %와 실제 재생 속도를 확인합니다.
-- VNJS 변화 구간과 easing 구간에서 표시 NJS 및 변경된 기본 NJS를 확인합니다.
-- Mod Settings 단위 변경 후 연습 화면을 다시 열어 NJS 간격을 확인합니다.
-- 다른 난이도 선택, 재시작, 일반 플레이 복귀 시 설정 누수와 중복 UI가 없는지 확인합니다.
-- JDFixer / BSPlus 사용 시 JD 설정이 유지되는지 확인합니다.
-- VR에서 텍스트 겹침, Play 버튼 접근성, 컨트롤러 조작을 확인합니다.
+이 저장소의 코드는 OpenAI Codex를 포함한 AI 코딩 도구를 사용해 생성·수정되었습니다. 빌드 및 자동 테스트 통과가 모든 기능의 게임 내 검증을 의미하지는 않습니다. 버전 지원 및 검증 관련 내용을 확인하세요.
