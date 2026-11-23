@@ -1,6 +1,6 @@
 # AdvancedPractice
 
-<a href="encore://add-source?url=https%3A%2F%2Fraw.githubusercontent.com%2FSieR-VR%2FAdvancedPractice%2Fmaster%2Findex.json">Add to Encore</a> · [Repository index](https://raw.githubusercontent.com/SieR-VR/AdvancedPractice/master/index.json)
+<a href="https://intradeus.github.io/http-protocol-redirector?r=encore://add-source?url=https%3A%2F%2Fraw.githubusercontent.com%2FSieR-VR%2FAdvancedPractice%2Fmaster%2Findex.json">Add to Encore</a> · [Repository index](https://raw.githubusercontent.com/SieR-VR/AdvancedPractice/master/index.json)
 
 [한국어](README-ko.md)
 

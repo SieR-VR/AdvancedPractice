@@ -1,6 +1,6 @@
 # AdvancedPractice
 
-<a href="encore://add-source?url=https%3A%2F%2Fraw.githubusercontent.com%2FSieR-VR%2FAdvancedPractice%2Fmaster%2Findex.json">Encore에 추가</a> · [저장소 인덱스](https://raw.githubusercontent.com/SieR-VR/AdvancedPractice/master/index.json)
+<a href="https://intradeus.github.io/http-protocol-redirector?r=encore://add-source?url=https%3A%2F%2Fraw.githubusercontent.com%2FSieR-VR%2FAdvancedPractice%2Fmaster%2Findex.json">Encore에 추가</a> · [저장소 인덱스](https://raw.githubusercontent.com/SieR-VR/AdvancedPractice/master/index.json)
 
 [English](README.md)
 
