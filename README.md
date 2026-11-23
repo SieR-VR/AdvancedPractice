@@ -2,11 +2,11 @@
 
 [한국어](README-ko.md)
 
-A practice setup screen extension for Beat Saber, primarily targeting **1.44.1**. It source-includes [LegatoBS 0.1.1](https://github.com/ScoreSaber/legato) for compatibility across game versions. Inspired by [denpadokei/PracticePlugin](https://github.com/denpadokei/PracticePlugin); this is an independent implementation without PracticePlugin source code.
+Advanced practice plugin for Beat Saber.
 
-## AI-generated code
+It source-includes [LegatoBS 0.1.1](https://github.com/ScoreSaber/legato) for compatibility across game versions.
 
-Code in this repository was generated and modified using AI coding tools, including OpenAI Codex. Build and automated test results do not establish that every feature has been verified in game; see the version support and validation sections below.
+Derived from [denpadokei/PracticePlugin](https://github.com/denpadokei/PracticePlugin), but this is not fork of PracticePlugin.
 
 ## Features
 
@@ -21,15 +21,12 @@ A newly selected chart starts at its original starting BPM and 100% speed, witho
 
 ## Version support
 
-| Game version | Legato profile | Status |
-| --- | --- | --- |
-| 1.44.1 | 1.42.0 | Primary target: build, API contracts, and manifest verified against actual game DLLs and BSML 1.14.1 |
-| 1.40.8 | 1.40.0 | Existing target: reverified against actual game DLLs and BSML 1.12.5 |
-| 1.29.0 | 1.29.0 | Provisional: compatibility branches and build configuration checked; not compiled against matching references |
-| 1.37.1 | 1.37.1 | Provisional: compatibility branches and build configuration checked; not compiled against matching references |
-| 1.38.0 | 1.38.0 | Provisional: compatibility branches and build configuration checked; not compiled against matching references |
+This plugin is built on [ScoreSaber/legato](https://github.com/ScoreSaber/legato), which is version-compatiblity layer for beat saber plugins.
 
-**VR runtime validation is still required for every version.** Each target gets a separate DLL; a single binary is not intended for all versions. Older targets support base NJS adjustment without standard VNJS event display. `Compatibility/` isolates the 1.29.0 difficulty beatmap loader, 1.37.1 loader arguments, and older BSML field/singleton names.
+| Game version  | Legato profile |
+| ------------- | -------------- |
+| 1.42.0-1.44.1 | 1.42.0         |
+| 1.40.0-1.40.8 | 1.40.0         |
 
 ## Installation
 
@@ -51,9 +48,6 @@ pwsh ./Build/Build.ps1 -GameDirectory 'D:\Games\Beat Saber 1.44.1'
 pwsh ./Build/Build.ps1 -GameVersion 1.44.1 -GameDirectory 'D:\Games\Beat Saber 1.44.1' -ModReferencesDirectory 'D:\Refs\1.44.1\Plugins'
 # Build other targets with their own matching reference folders:
 pwsh ./Build/Build.ps1 -GameVersion 1.40.8 -GameDirectory 'D:\Games\Beat Saber 1.40.8'
-pwsh ./Build/Build.ps1 -GameVersion 1.29.0 -GameDirectory 'D:\Games\Beat Saber 1.29.0'
-pwsh ./Build/Build.ps1 -GameVersion 1.37.1 -GameDirectory 'D:\Games\Beat Saber 1.37.1'
-pwsh ./Build/Build.ps1 -GameVersion 1.38.0 -GameDirectory 'D:\Games\Beat Saber 1.38.0'
 
 dotnet run --project Tests/AdvancedPractice.Tests.csproj -c Release
 pwsh ./Tests/BuildProfiles.Tests.ps1
@@ -73,15 +67,6 @@ Use the installed Legato CLI if you need to reconfigure the integration. If .NET
 
 Legato source is compiled into the plugin, so distribution is under GPLv3. See [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Publish the matching `AdvancedPractice-<plugin-version>-bs<game-version>-source.zip` alongside each installation ZIP. This separate source asset includes the exact build source, Legato 0.1.1 source, both READMEs, license notices, and build metadata; these files are not placed in the installation ZIP. Game, BSIPA, and BSML reference DLLs and personal configuration files are excluded.
 
-## In-game validation
+## AI-generated code
 
-VR runtime validation has not yet been performed. Before relying on a build, check:
-
-- Beat, seconds, and BPM against a mapping tool on constant-BPM and BPM-changing maps.
-- Song preview after one-beat changes, rapid dragging, and selections made during audio loading; leaving the screen cancels pending playback.
-- Displayed speed percentage and actual playback speed after slider and button changes.
-- NJS display and base NJS changes across VNJS events and easing segments.
-- NJS step changes after reopening the practice screen.
-- Selection retention and duplicate UI after difficulty changes, restarts, and returning to normal play.
-- JD settings while using JDFixer or BSPlus.
-- Text overlap, Play-button accessibility, note hint visibility, and VR controller interaction.
+Code in this repository was generated and modified using AI coding tools, including OpenAI Codex. Build and automated test results do not establish that every feature has been verified in game; see the version support and validation sections below.
