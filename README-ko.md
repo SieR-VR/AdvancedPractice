@@ -1,5 +1,7 @@
 # AdvancedPractice
 
+[Encore에 추가](encore://add-source?url=https%3A%2F%2Fraw.githubusercontent.com%2FSieR-VR%2FAdvancedPractice%2Fmaster%2Findex.json) · [저장소 인덱스](https://raw.githubusercontent.com/SieR-VR/AdvancedPractice/master/index.json)
+
 [English](README.md)
 
 Beat Saber용 고급 연습 플러그인입니다.

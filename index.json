@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 1,
+  "id": "dev.siervr.advancedpractice",
+  "name": "AdvancedPractice",
+  "owner": "SieR-VR",
+  "contactUrl": "https://github.com/SieR-VR/AdvancedPractice/issues",
+  "infoUrl": "https://github.com/SieR-VR/AdvancedPractice",
+  "packages": [
+    {
+      "id": "AdvancedPractice",
+      "name": "AdvancedPractice",
+      "summary": "Beat-based practice start, BPM speed controls, NJS adjustment and next-note hints.",
+      "description": "# AdvancedPractice\n\nPractice setup controls with beat-based start selection, native song preview, BPM speed and base NJS adjustment, and per-hand next-note hints.\n\nRequires BSIPA and BeatSaberMarkupLanguage. Remove PracticePlugin before installing; the two plugins are incompatible.\n\n![Practice setup screen](https://raw.githubusercontent.com/SieR-VR/AdvancedPractice/master/docs/images/practice-mode.png)",
+      "category": "practice",
+      "author": "SieR",
+      "sourceUrl": "https://github.com/SieR-VR/AdvancedPractice",
+      "issuesUrl": "https://github.com/SieR-VR/AdvancedPractice/issues",
+      "versions": [
+        {
+          "version": "0.3.0",
+          "gameVersions": [
+            "1.44.1"
+          ],
+          "platforms": [
+            "universalpc"
+          ],
+          "downloadUrl": "https://github.com/SieR-VR/AdvancedPractice/releases/download/v0.3.0/AdvancedPractice-0.3.0-bs1.44.1.zip",
+          "fileSizeBytes": 52587,
+          "hash": {
+            "algorithm": "sha256",
+            "value": "b6a471d9476bdbc07f44284337740ce5bd7ccaaf88ef51466fad836d188b988d"
+          },
+          "dependencies": [
+            "beatmods:1",
+            "beatmods:96"
+          ],
+          "files": [
+            {
+              "path": "Plugins/AdvancedPractice.dll",
+              "hash": {
+                "algorithm": "sha256",
+                "value": "f032406cd1b2e3c67385cfbce785b5939054386fe1b2ce2385561eb868bf339b"
+              }
+            },
+            {
+              "path": "Plugins/AdvancedPractice.pdb",
+              "hash": {
+                "algorithm": "sha256",
+                "value": "7170f1c81dbc68de0a9d2fa73f2a3a36e5265c3aea8eba846a1dc363e34d47fa"
+              }
+            }
+          ]
+        },
+        {
+          "version": "0.3.0",
+          "gameVersions": [
+            "1.40.8"
+          ],
+          "platforms": [
+            "universalpc"
+          ],
+          "downloadUrl": "https://github.com/SieR-VR/AdvancedPractice/releases/download/v0.3.0/AdvancedPractice-0.3.0-bs1.40.8.zip",
+          "fileSizeBytes": 52219,
+          "hash": {
+            "algorithm": "sha256",
+            "value": "6e74852d4c0579ad7a9cd804d716dbb7cf24f24a11822574edd1491998f95352"
+          },
+          "dependencies": [
+            "beatmods:1",
+            "beatmods:96"
+          ],
+          "files": [
+            {
+              "path": "Plugins/AdvancedPractice.dll",
+              "hash": {
+                "algorithm": "sha256",
+                "value": "1d1a931ab73a539baa41cf09860575db250fa0e0fbd380f925c7448c9ceb04f4"
+              }
+            },
+            {
+              "path": "Plugins/AdvancedPractice.pdb",
+              "hash": {
+                "algorithm": "sha256",
+                "value": "456790c552a93dbbd65ddf7023690b424c10b9444ef3361293fb5a19b882643e"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
