@@ -78,6 +78,7 @@ namespace AdvancedPractice
         [UIAction("plus-one")] private void PlusOne() { Speed += 1; }
         [UIAction("plus-five")] private void PlusFive() { Speed += 5; }
         [UIAction("plus-ten")] private void PlusTen() { Speed += 10; }
+        [UIAction("reset-bpm")] private void ResetBpm() { if (ready) Speed = (float)timeline.BpmAt(Time); }
         [UIAction("reset-njs")] private void ResetNjs() { Njs = defaultNjs; }
         internal static T Field<T>(object owner, string name) => (T)AccessTools.Field(owner.GetType(), name).GetValue(owner);
 
@@ -176,13 +177,8 @@ namespace AdvancedPractice
             hintRect.pivot = new Vector2(1, .5f);
             hintRect.sizeDelta = new Vector2(22, 11);
             PositionNoteHint();
-            var labelObject = new GameObject("Label", typeof(RectTransform));
-            labelObject.layer = 5;
-            labelObject.transform.SetParent(noteHint.transform, false);
-            noteHintLabel = labelObject.AddComponent<TextMeshProUGUI>();
-            var playText = playRect.GetComponentInChildren<TextMeshProUGUI>();
-            noteHintLabel.font = playText.font;
-            noteHintLabel.fontSharedMaterial = playText.fontSharedMaterial;
+            noteHintLabel = Legato.Presentation.CurvedTextFactory.Create(hintRect, "Next L / R", Vector2.zero);
+            noteHintLabel.gameObject.name = "Label";
             noteHintLabel.fontSize = 2.5f;
             noteHintLabel.alignment = TextAlignmentOptions.Center;
             noteHintLabel.raycastTarget = false;
@@ -243,13 +239,8 @@ namespace AdvancedPractice
                 image.raycastTarget = false;
                 if (note == null)
                 {
-                    var emptyObject = new GameObject("NoNote", typeof(RectTransform));
-                    emptyObject.layer = 5;
-                    emptyObject.transform.SetParent(tile.transform, false);
-                    var emptyText = emptyObject.AddComponent<TextMeshProUGUI>();
-                    emptyText.font = noteHintLabel.font;
-                    emptyText.fontSharedMaterial = noteHintLabel.fontSharedMaterial;
-                    emptyText.text = "None";
+                    var emptyText = Legato.Presentation.CurvedTextFactory.Create(rect, "None", Vector2.zero);
+                    emptyText.gameObject.name = "NoNote";
                     emptyText.fontSize = 1.5f;
                     emptyText.alignment = TextAlignmentOptions.Center;
                     emptyText.raycastTarget = false;
