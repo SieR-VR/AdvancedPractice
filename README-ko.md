@@ -8,6 +8,8 @@ Beat Saber용 고급 연습 플러그인입니다.
 
 [denpadokei/PracticePlugin](https://github.com/denpadokei/PracticePlugin)을 바탕으로 제작했지만, PracticePlugin의 포크는 아닙니다.
 
+![beat·BPM·NJS 조절과 다음 노트 힌트가 표시된 AdvancedPractice 설정 화면](docs/images/practice-mode.png)
+
 ## 기능
 
 - **Song Start:** 매핑 툴의 beat(0부터 시작)를 1 단위로 지정합니다. BPM 변경 이벤트를 반영한 시작 시각을 소수점 세 자리 seconds로 표시하고 해당 위치 BPM을 표시합니다. 시작 beat를 변경하면 기본 Practice Mode의 미리듣기 함수를 사용해 해당 구간을 재생합니다. 드래그 중에는 마지막 변경 후 0.15초 뒤에 반영하고, 곡 로딩 중 선택한 위치는 로딩 완료 후 재생합니다.

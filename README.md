@@ -8,6 +8,8 @@ It source-includes [LegatoBS 0.1.1](https://github.com/ScoreSaber/legato) for co
 
 Derived from [denpadokei/PracticePlugin](https://github.com/denpadokei/PracticePlugin), but this is not fork of PracticePlugin.
 
+![AdvancedPractice setup screen with beat, BPM, NJS controls and next-note hints](docs/images/practice-mode.png)
+
 ## Features
 
 - **Song Start:** Choose a zero-based beat in increments of 1, as in mapping tools. The display shows the corresponding start time in seconds to three decimal places and the BPM at that position, accounting for BPM changes. Changing the start beat previews that part of the song using the original Practice Mode preview function. Updates are debounced by 0.15 seconds while dragging, and selections made during audio loading play once the clip is ready.
