@@ -32,7 +32,7 @@ Beat Saber용 고급 연습 플러그인입니다.
 
 1. 대상 게임 버전에 맞는 BSIPA와 BeatSaberMarkupLanguage를 설치합니다. 1.44.1은 BSIPA 4.3.7+, BSML 1.14.1+가 필요합니다.
 2. **PracticePlugin을 제거합니다.** 함께 로드되면 AdvancedPractice는 오류를 기록하고 기능을 활성화하지 않습니다.
-3. 게임 버전과 일치하는 `artifacts/AdvancedPractice-0.2.0-bs<버전>.zip`의 `Plugins` 폴더를 게임 폴더에 복사합니다. 설치 ZIP에는 `Plugins/AdvancedPractice.dll`과 해당 빌드의 portable PDB만 들어 있습니다. 직접 빌드한 파일은 `bin/Release/<버전>/`에 있습니다.
+3. 게임 버전과 일치하는 `artifacts/AdvancedPractice-0.3.0-bs<버전>.zip`의 `Plugins` 폴더를 게임 폴더에 복사합니다. 설치 ZIP에는 `Plugins/AdvancedPractice.dll`과 해당 빌드의 portable PDB만 들어 있습니다. 직접 빌드한 파일은 `bin/Release/<버전>/`에 있습니다.
 4. 게임을 다시 시작하고 곡 선택 화면에서 Practice Mode에 진입합니다.
 
 이 버전은 요청한 **곡 시작 전 연습 설정 화면**을 구현합니다. 원본 PracticePlugin의 일시정지 seek/loop, 실패 시간 표시, 에너지 보정 기능은 포함하지 않습니다. 게임 폴더에는 자동 배포하지 않습니다.

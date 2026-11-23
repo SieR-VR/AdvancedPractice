@@ -32,7 +32,7 @@ This plugin is built on [ScoreSaber/legato](https://github.com/ScoreSaber/legato
 
 1. Install BSIPA and BeatSaberMarkupLanguage versions compatible with your game. Beat Saber 1.44.1 requires BSIPA 4.3.7+ and BSML 1.14.1+.
 2. **Remove PracticePlugin.** If both plugins are loaded, AdvancedPractice logs an error and does not activate its features.
-3. Copy the `Plugins` folder from the matching `artifacts/AdvancedPractice-0.2.0-bs<version>.zip` into the game folder. The installation ZIP contains only `Plugins/AdvancedPractice.dll` and its matching portable PDB. Direct build outputs are located at `bin/Release/<version>/`.
+3. Copy the `Plugins` folder from the matching `artifacts/AdvancedPractice-0.3.0-bs<version>.zip` into the game folder. The installation ZIP contains only `Plugins/AdvancedPractice.dll` and its matching portable PDB. Direct build outputs are located at `bin/Release/<version>/`.
 4. Restart the game and enter Practice Mode from song selection.
 
 This plugin implements the **practice setup screen before a song starts**. PracticePlugin's pause-menu seeking/looping, failure-time display, and energy adjustments are not included. Build scripts do not deploy into the game automatically.
