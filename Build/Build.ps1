@@ -35,38 +35,7 @@ $package = Join-Path $stage $packageName
 New-Item -ItemType Directory -Force (Join-Path $package 'Plugins') | Out-Null
 Copy-Item -LiteralPath $dll -Destination (Join-Path $package 'Plugins/AdvancedPractice.dll')
 Copy-Item -LiteralPath $pdb -Destination (Join-Path $package 'Plugins/AdvancedPractice.pdb')
-# Publish corresponding source as a separate release asset, not inside the install ZIP.
-$source = Join-Path $stage 'source'
-New-Item -ItemType Directory -Force $source | Out-Null
-@{ GameVersion = $GameVersion; Support = $tier; LegatoPackage = '0.1.1'; SourceApi = '1.40.8'; Configuration = $Configuration } |
-    ConvertTo-Json | Set-Content (Join-Path $source 'BUILD-INFO.json')
-foreach ($name in @('AdvancedPractice.csproj','Directory.Build.props','Plugin.cs','AdvancedPracticeController.cs','manifest.json','README.md','README-ko.md','AGENTS.md','LICENSE','THIRD_PARTY_NOTICES.md','.gitignore')) {
-    Copy-Item -LiteralPath (Join-Path $repo $name) -Destination $source
-}
-foreach ($directory in @('Build','Compatibility','Configuration','Models','Views','Properties','Tests')) {
-    $base = Join-Path $repo $directory
-    foreach ($file in Get-ChildItem -LiteralPath $base -File -Recurse) {
-        $relative = [IO.Path]::GetRelativePath($repo, $file.FullName)
-        if ($relative -match '[\\/](bin|obj)[\\/]') { continue }
-        $destination = Join-Path $source $relative
-        New-Item -ItemType Directory -Force (Split-Path $destination -Parent) | Out-Null
-        Copy-Item -LiteralPath $file.FullName -Destination $destination
-    }
-}
-$assets = Get-Content -Raw (Join-Path $repo 'obj/project.assets.json') | ConvertFrom-Json
-$legatoBuild = $null
-foreach ($folder in $assets.packageFolders.PSObject.Properties.Name) {
-    $candidate = Join-Path $folder 'legatobs/0.1.1/build'
-    if (Test-Path -LiteralPath $candidate) { $legatoBuild = $candidate; break }
-}
-if (!$legatoBuild) { throw 'The exact Legato source package is required for the source release asset. Restore packages first.' }
-$thirdParty = Join-Path $source 'ThirdParty/Legato'
-New-Item -ItemType Directory -Force $thirdParty | Out-Null
-Copy-Item -LiteralPath $legatoBuild -Destination $thirdParty -Recurse
-$sourceZip = Join-Path $artifacts "$packageName-source.zip"
-Compress-Archive -Path (Join-Path $source '*') -DestinationPath $sourceZip -Force
 $zip = Join-Path $artifacts "$packageName.zip"
 Compress-Archive -Path (Join-Path $package '*') -DestinationPath $zip -Force
 Write-Host "Package: $zip"
-Write-Host "Corresponding source: $sourceZip"
 Write-Host "Support: $tier. No game files were installed or modified."

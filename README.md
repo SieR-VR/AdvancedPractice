@@ -65,7 +65,7 @@ Use the installed Legato CLI if you need to reconfigure the integration. If .NET
 
 ## License
 
-Legato source is compiled into the plugin, so distribution is under GPLv3. See [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Publish the matching `AdvancedPractice-<plugin-version>-bs<game-version>-source.zip` alongside each installation ZIP. This separate source asset includes the exact build source, Legato 0.1.1 source, both READMEs, license notices, and build metadata; these files are not placed in the installation ZIP. Game, BSIPA, and BSML reference DLLs and personal configuration files are excluded.
+Legato source is compiled into the plugin, so distribution is under GPLv3. See [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). Release assets contain only installation ZIPs with the DLL and PDB under `Plugins/`. Project source is available through GitHub's automatic **Source code (zip)** / **Source code (tar.gz)** links for the release tag. The pinned LegatoBS 0.1.1 source is available through NuGet; see the third-party notices. The build script does not generate separate source archives. Game, BSIPA, and BSML reference DLLs and personal configuration files are excluded.
 
 ## AI-generated code
 

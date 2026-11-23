@@ -65,7 +65,7 @@ Legato CLI를 다시 설정할 때는 설치된 CLI를 사용합니다. .NET 8 �
 
 ## 라이선스
 
-Legato 소스가 DLL에 포함되므로 배포 라이선스는 GPLv3입니다. `LICENSE`와 `THIRD_PARTY_NOTICES.md`를 확인하세요. 설치 ZIP과 함께 같은 버전의 `AdvancedPractice-<플러그인 버전>-bs<게임 버전>-source.zip`을 별도 릴리스 파일로 게시합니다. 소스 ZIP에는 정확한 빌드 소스, Legato 0.1.1 소스, 양쪽 README, 라이선스 고지 및 빌드 정보가 들어 있으며 설치 ZIP에는 넣지 않습니다. 게임/BSIPA/BSML 참조 DLL과 개인 설정 파일은 배포하지 않습니다.
+Legato 소스가 DLL에 포함되므로 배포 라이선스는 GPLv3입니다. `LICENSE`와 `THIRD_PARTY_NOTICES.md`를 확인하세요. 릴리스에는 `Plugins/` 아래 DLL과 PDB가 들어 있는 설치 ZIP만 게시합니다. 프로젝트 소스는 릴리스 태그에 대해 GitHub가 자동 제공하는 **Source code (zip)** / **Source code (tar.gz)** 링크에서 받을 수 있습니다. 고정된 LegatoBS 0.1.1 소스는 NuGet에서 받을 수 있으며 자세한 정보는 서드파티 고지를 참고하세요. 빌드 스크립트는 별도 소스 아카이브를 생성하지 않습니다. 게임/BSIPA/BSML 참조 DLL과 개인 설정 파일은 배포하지 않습니다.
 
 ## AI를 사용한 코드 생성
 
