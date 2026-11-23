@@ -1,6 +1,6 @@
 # AdvancedPractice
 
-[Encore에 추가](encore://add-source?url=https%3A%2F%2Fraw.githubusercontent.com%2FSieR-VR%2FAdvancedPractice%2Fmaster%2Findex.json) · [저장소 인덱스](https://raw.githubusercontent.com/SieR-VR/AdvancedPractice/master/index.json)
+<a href="encore://add-source?url=https%3A%2F%2Fraw.githubusercontent.com%2FSieR-VR%2FAdvancedPractice%2Fmaster%2Findex.json">Encore에 추가</a> · [저장소 인덱스](https://raw.githubusercontent.com/SieR-VR/AdvancedPractice/master/index.json)
 
 [English](README.md)
 
@@ -27,10 +27,10 @@ Beat Saber용 고급 연습 플러그인입니다.
 
 이 플러그인은 Beat Saber 플러그인의 버전 호환성 계층인 [ScoreSaber/legato](https://github.com/ScoreSaber/legato)를 기반으로 합니다.
 
-| 게임 버전 | Legato 프로필 |
-| --- | --- |
-| 1.42.0–1.44.1 | 1.42.0 |
-| 1.40.0–1.40.8 | 1.40.0 |
+| 게임 버전     | Legato 프로필 |
+| ------------- | ------------- |
+| 1.42.0–1.44.1 | 1.42.0        |
+| 1.40.0–1.40.8 | 1.40.0        |
 
 ## 설치
 
